@@ -1,0 +1,6 @@
+body {
+  padding: 1rem;
+}
+h1 {
+  font-size: var(--font-size-5);
+}

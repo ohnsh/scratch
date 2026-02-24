@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/Base.astro'
+import { YouTube } from '@astro-community/astro-embed-youtube'
+import YTicon from '../assets/youtube.svg'
+
+// GET https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&forHandle=%40ohn-sh&key=[YOUR_API_KEY] HTTP/1.1
+// Authorization: Bearer [YOUR_ACCESS_TOKEN]
+// Accept: application/json
+
+// const json = await fetch(url).then(res => res.json())
+---
+
+<BaseLayout title="YouTube Data API Loader">
+	<YTicon fill="#ccc" />
+<!--	<h2>{title}</h2>
+	<p><a href={author.uri}>channel</a></p>
+
+				<YouTube id={id} posterQuality="max" />
+				<p><a href={link}>{title}</a></p>
+				<p>{(new Date(published)).toLocaleDateString()}</p>
+-->
+</BaseLayout>

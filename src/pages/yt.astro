@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/Base.astro'
+import { XMLParser } from 'fast-xml-parser'
+import { YouTube } from '@astro-community/astro-embed-youtube'
+import YTicon from '../assets/youtube.svg'
+
+const channelId = 'UCFpptpegJ_Ys54PGYwTYPPg'
+const rss = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`
+const parser = new XMLParser({ ignoreAttributes: false })
+const xml = await fetch(rss).then(res => res.text()).then((xml) => parser.parse(xml))
+const { feed: { title, author, entry: entries } } = xml
+// console.log( entries )
+---
+
+<BaseLayout title="YouTube RSS Loader">
+	<YTicon fill="#ccc" />
+	<h2>{title}</h2>
+	<p><a href={author.uri}>channel</a></p>
+
+	{ entries.map((entry) => {
+			const { 'yt:videoId': id, link: {'@_href': link}, title, published } = entry
+			return (
+				<YouTube id={id} posterQuality="max" />
+				<p><a href={link}>{title}</a></p>
+				<p>{(new Date(published)).toLocaleDateString()}</p>
+			)
+	}) }
+</BaseLayout>
