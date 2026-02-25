@@ -11,9 +11,11 @@
   "dependencies": {
     "@astro-community/astro-embed-youtube": "^0.5.10",
     "@astrojs/react": "^4.4.2",
+    "@astrojs/starlight": "^0.37.6",
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@xterm/xterm": "^6.0.0",
     "astro": "^5.17.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
