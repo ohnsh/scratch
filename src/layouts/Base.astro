@@ -1,10 +1,15 @@
 ---
 import '@/styles/local.css'
 
-const { title } = Astro.props
+interface Props {
+	title: string,
+	class?: string,
+}
+
+const { title, ...htmlProps } = Astro.props
 ---
 
-<html lang="en" class="dark">
+<html lang="en" {...htmlProps}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="/favicon.ico" sizes="32x32" />
