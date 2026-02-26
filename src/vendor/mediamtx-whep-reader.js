@@ -384,11 +384,11 @@ export class MediaMTXWebRTCReader {
       this.queuedCandidates = [];
       this.state = 'restarting';
 
-      this.restartTimeout = window.setTimeout(() => {
+      /*this.restartTimeout = window.setTimeout(() => {
         this.restartTimeout = null;
         this.state = 'running';
         this.#start();
-      }, this.retryPause);
+      }, this.retryPause);*/
 
       if (this.conf.onError !== undefined) {
         this.conf.onError(`${err}, retrying in some seconds`);
