@@ -3,11 +3,11 @@ title: WebRTC stream viewer
 description: thingino → mediamtx → cloudflared → cam-rtc.ohn.sh
 ---
 
-import MediamtxViewer from '@/components/MediamtxViewer.astro'
+import MediaMTXViewer from '@/components/MediaMTXViewer.astro'
 
-<MediamtxViewer />
+<MediaMTXViewer whepUrl="https://cam-rtc.ohn.sh/thing/whep" />
 
-This WebRTC/WHEP viewer is adapted (for Astro) from the source of [MediaMTX](https://github.com/bluenviron/mediamtx).
+This WebRTC/WHEP viewer is adapted (for Astro) from the source of [MediaMTX](https://mediamtx.org/docs/other/embed-streams-in-a-website).
 
 ### Notes
     - While WHEP signaling (HTTP) happens over a Cloudflare tunnel (cam-rtc.ohn.sh), the media stream itself is transmitted directly from mediamtx on my home network to the browser. This UDP-based NAT "hole-punching" is a primary mechanism of WebRTC.

@@ -1,15 +1,15 @@
-<video id="video"></video>
+---
+const { whepUrl } = Astro.props
+---
+
+<video data-whep-url={whepUrl} id="video"></video>
 <div id="message"></div>
 
 <script>
 import { MediaMTXWebRTCReader } from '@/vendor/mediamtx-whep-reader.js'
 
-const stream = 'https://cam-rtc.ohn.sh/thing/whep'
-
 const video = document.getElementById('video') as HTMLVideoElement;
 const message = document.getElementById('message') as HTMLDivElement;
-let defaultControls = false;
-let reader: MediaMTXWebRTCReader | null = null;
 
 const setMessage = (str: string) => {
   if (str !== '') {
@@ -32,42 +32,33 @@ const parseBoolString = (str: string | null, defaultVal: boolean) => {
   return defaultVal;
 };
 
-const loadAttributesFromQuery = () => {
-  const params = new URLSearchParams(window.location.search);
-  video.controls = parseBoolString(params.get('controls'), true);
-  video.muted = parseBoolString(params.get('muted'), true);
-  video.autoplay = parseBoolString(params.get('autoplay'), true);
-  video.playsInline = parseBoolString(params.get('playsinline'), true);
-  video.disablePictureInPicture = parseBoolString(params.get('disablepictureinpicture'), false);
-  defaultControls = video.controls;
-};
+const params = new URLSearchParams(window.location.search);
+video.controls = parseBoolString(params.get('controls'), true);
+video.muted = parseBoolString(params.get('muted'), true);
+video.autoplay = parseBoolString(params.get('autoplay'), true);
+video.playsInline = parseBoolString(params.get('playsinline'), true);
+video.disablePictureInPicture = parseBoolString(params.get('disablepictureinpicture'), false);
+const defaultControls = video.controls;
+const { whepUrl } = video.dataset
 
-window.addEventListener('load', () => {
-  loadAttributesFromQuery();
-
-  reader = new MediaMTXWebRTCReader({
-    url: new URL(stream) + window.location.search,
-    onError: (err) => {
-      setMessage(err);
-    },
-    onTrack: (evt) => {
-      setMessage('');
-      video.srcObject = evt.streams[0];
-    },
-    onDataChannel: (evt) => {
-      evt.channel.binaryType = 'arraybuffer';
-      evt.channel.onmessage = (evt) => {
-        console.log('data channel message', evt.data);
-      };
-    },
-  });
+const reader = new MediaMTXWebRTCReader({
+  url: new URL(whepUrl!) + window.location.search,
+  onError: (err) => {
+    setMessage(err);
+  },
+  onTrack: (evt) => {
+    setMessage('');
+    video.srcObject = evt.streams[0];
+  },
+  onDataChannel: (evt) => {
+    evt.channel.binaryType = 'arraybuffer';
+    evt.channel.onmessage = (evt) => {
+      console.log('data channel message', evt.data);
+    };
+  },
 });
 
-window.addEventListener('beforeunload', () => {
-  if (reader !== null) {
-    reader.close();
-  }
-});
+window.addEventListener('beforeunload', () => reader?.close());
 </script>
 
 <style>

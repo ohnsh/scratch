@@ -1,26 +1,6 @@
 // https://github.com/bluenviron/mediamtx/blob/main/internal/servers/webrtc/reader.js
 
-// MIT License
-
-// Copyright (c) 2019 aler9
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Removed bulky code for detecting supported audio codecs that aren't advertised by default.
 
 /**
  * @callback OnError
@@ -38,12 +18,11 @@
  */
 
 /**
- * @typedef Conf
- * @type {object}
+ * @typedef {object} Conf
  * @property {string} url - absolute URL of the WHEP endpoint.
- * @property {string} user - username.
- * @property {string} pass - password.
- * @property {string} token - token.
+ * @property {string} [user] - username.
+ * @property {string} [pass] - password.
+ * @property {string} [token] - token.
  * @property {OnError} onError - called when there's an error.
  * @property {OnTrack} onTrack - called when there's a track available.
  * @property {OnDataChannel} onDataChannel - called when there's a data channel available.
@@ -58,13 +37,14 @@ export class MediaMTXWebRTCReader {
   constructor(conf) {
     this.retryPause = 2000;
     this.conf = conf;
-    this.state = 'getting_codecs';
     this.restartTimeout = null;
     this.pc = null;
     this.offerData = null;
     this.sessionUrl = null;
     this.queuedCandidates = [];
-    this.#getNonAdvertisedCodecs();
+  
+    this.state = 'running';
+    this.#start();
   }
 
   /**
@@ -80,69 +60,6 @@ export class MediaMTXWebRTCReader {
     if (this.restartTimeout !== null) {
       clearTimeout(this.restartTimeout);
     }
-  }
-
-  static #supportsNonAdvertisedCodec(codec, fmtp) {
-    return new Promise((resolve) => {
-      const pc = new RTCPeerConnection({ iceServers: [] });
-      const mediaType = 'audio';
-      let payloadType = '';
-
-      pc.addTransceiver(mediaType, { direction: 'recvonly' });
-      pc.createOffer()
-        .then((offer) => {
-          if (offer.sdp === undefined) {
-            throw new Error('SDP not present');
-          }
-          if (offer.sdp.includes(` ${codec}`)) { // codec is advertised, there's no need to add it manually
-            throw new Error('already present');
-          }
-
-          const sections = offer.sdp.split(`m=${mediaType}`);
-
-          const payloadTypes = sections.slice(1)
-            .map((s) => s.split('\r\n')[0].split(' ').slice(3))
-            .reduce((prev, cur) => [...prev, ...cur], []);
-          payloadType = this.#reservePayloadType(payloadTypes);
-
-          const lines = sections[1].split('\r\n');
-          lines[0] += ` ${payloadType}`;
-          lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} ${codec}`);
-          if (fmtp !== undefined) {
-            lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} ${fmtp}`);
-          }
-          sections[1] = lines.join('\r\n');
-          offer.sdp = sections.join(`m=${mediaType}`);
-          return pc.setLocalDescription(offer);
-        })
-        .then(() => (
-          pc.setRemoteDescription(new RTCSessionDescription({
-            type: 'answer',
-            sdp: 'v=0\r\n'
-            + 'o=- 6539324223450680508 0 IN IP4 0.0.0.0\r\n'
-            + 's=-\r\n'
-            + 't=0 0\r\n'
-            + 'a=fingerprint:sha-256 0D:9F:78:15:42:B5:4B:E6:E2:94:3E:5B:37:78:E1:4B:54:59:A3:36:3A:E5:05:EB:27:EE:8F:D2:2D:41:29:25\r\n'
-            + `m=${mediaType} 9 UDP/TLS/RTP/SAVPF ${payloadType}\r\n`
-            + 'c=IN IP4 0.0.0.0\r\n'
-            + 'a=ice-pwd:7c3bf4770007e7432ee4ea4d697db675\r\n'
-            + 'a=ice-ufrag:29e036dc\r\n'
-            + 'a=sendonly\r\n'
-            + 'a=rtcp-mux\r\n'
-            + `a=rtpmap:${payloadType} ${codec}\r\n`
-            + ((fmtp !== undefined) ? `a=fmtp:${payloadType} ${fmtp}\r\n` : ''),
-          }))
-        ))
-        .then(() => {
-          resolve(true);
-        })
-        .catch(() => {
-          resolve(false);
-        })
-        .finally(() => {
-          pc.close();
-        });
-    });
   }
 
   static #unquoteCredential(v) {
@@ -199,85 +116,6 @@ export class MediaMTXWebRTCReader {
     throw Error('unable to find a free payload type');
   }
 
-  static #enableStereoPcmau(payloadTypes, section) {
-    const lines = section.split('\r\n');
-
-    let payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} PCMU/8000/2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} PCMA/8000/2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    return lines.join('\r\n');
-  }
-
-  static #enableMultichannelOpus(payloadTypes, section) {
-    const lines = section.split('\r\n');
-
-    let payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} multiopus/48000/3`);
-    lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} channel_mapping=0,2,1;num_streams=2;coupled_streams=1`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} multiopus/48000/4`);
-    lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} channel_mapping=0,1,2,3;num_streams=2;coupled_streams=2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} multiopus/48000/5`);
-    lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} channel_mapping=0,4,1,2,3;num_streams=3;coupled_streams=2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} multiopus/48000/6`);
-    lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} channel_mapping=0,4,1,2,3,5;num_streams=4;coupled_streams=2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} multiopus/48000/7`);
-    lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} channel_mapping=0,4,1,2,3,5,6;num_streams=4;coupled_streams=4`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} multiopus/48000/8`);
-    lines.splice(lines.length - 1, 0, `a=fmtp:${payloadType} channel_mapping=0,6,1,4,5,2,3,7;num_streams=5;coupled_streams=4`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    return lines.join('\r\n');
-  }
-
-  static #enableL16(payloadTypes, section) {
-    const lines = section.split('\r\n');
-
-    let payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} L16/8000/2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} L16/16000/2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    payloadType = this.#reservePayloadType(payloadTypes);
-    lines[0] += ` ${payloadType}`;
-    lines.splice(lines.length - 1, 0, `a=rtpmap:${payloadType} L16/48000/2`);
-    lines.splice(lines.length - 1, 0, `a=rtcp-fb:${payloadType} transport-cc`);
-
-    return lines.join('\r\n');
-  }
-
   static #enableStereoOpus(section) {
     let opusPayloadFormat = '';
     const lines = section.split('\r\n');
@@ -307,7 +145,7 @@ export class MediaMTXWebRTCReader {
     return lines.join('\r\n');
   }
 
-  static #editOffer(sdp, nonAdvertisedCodecs) {
+  static #editOffer(sdp) {
     const sections = sdp.split('m=');
 
     const payloadTypes = sections.slice(1)
@@ -317,16 +155,6 @@ export class MediaMTXWebRTCReader {
     for (let i = 1; i < sections.length; i++) {
       if (sections[i].startsWith('audio')) {
         sections[i] = this.#enableStereoOpus(sections[i]);
-
-        if (nonAdvertisedCodecs.includes('pcma/8000/2')) {
-          sections[i] = this.#enableStereoPcmau(payloadTypes, sections[i]);
-        }
-        if (nonAdvertisedCodecs.includes('multiopus/48000/6')) {
-          sections[i] = this.#enableMultichannelOpus(payloadTypes, sections[i]);
-        }
-        if (nonAdvertisedCodecs.includes('L16/48000/2')) {
-          sections[i] = this.#enableL16(payloadTypes, sections[i]);
-        }
 
         break;
       }
@@ -384,11 +212,11 @@ export class MediaMTXWebRTCReader {
       this.queuedCandidates = [];
       this.state = 'restarting';
 
-      /*this.restartTimeout = window.setTimeout(() => {
+      this.restartTimeout = window.setTimeout(() => {
         this.restartTimeout = null;
         this.state = 'running';
         this.#start();
-      }, this.retryPause);*/
+      }, this.retryPause);
 
       if (this.conf.onError !== undefined) {
         this.conf.onError(`${err}, retrying in some seconds`);
@@ -400,28 +228,6 @@ export class MediaMTXWebRTCReader {
         this.conf.onError(err);
       }
     }
-  }
-
-  #getNonAdvertisedCodecs() {
-    Promise.all([
-      ['pcma/8000/2'],
-      ['multiopus/48000/6', 'channel_mapping=0,4,1,2,3,5;num_streams=4;coupled_streams=2'],
-      ['L16/48000/2'],
-    ]
-      .map((c) => MediaMTXWebRTCReader.#supportsNonAdvertisedCodec(c[0], c[1]).then((r) => ((r) ? c[0] : false))))
-      .then((c) => c.filter((e) => e !== false))
-      .then((codecs) => {
-        if (this.state !== 'getting_codecs') {
-          throw new Error('closed');
-        }
-
-        this.nonAdvertisedCodecs = codecs;
-        this.state = 'running';
-        this.#start();
-      })
-      .catch((err) => {
-        this.#handleError(err);
-      });
   }
 
   #start() {
@@ -475,12 +281,12 @@ export class MediaMTXWebRTCReader {
 
     this.pc.onicecandidate = (evt) => this.#onLocalCandidate(evt);
     this.pc.onconnectionstatechange = () => this.#onConnectionState();
-    this.pc.ontrack = (evt) => this.#onTrack(evt);
-    this.pc.ondatachannel = (evt) => this.#onDataChannel(evt);
+    this.pc.ontrack = (evt) => this.conf.onTrack?.(evt);
+    this.pc.ondatachannel = (evt) => this.conf.onDataChannel?.(evt);
 
     return this.pc.createOffer()
       .then((offer) => {
-        offer.sdp = MediaMTXWebRTCReader.#editOffer(offer.sdp, this.nonAdvertisedCodecs);
+        offer.sdp = MediaMTXWebRTCReader.#editOffer(offer.sdp);
         this.offerData = MediaMTXWebRTCReader.#parseOffer(offer.sdp);
 
         return this.pc.setLocalDescription(offer)
@@ -593,18 +399,4 @@ export class MediaMTXWebRTCReader {
       this.#handleError('peer connection closed');
     }
   }
-
-  #onTrack(evt) {
-    if (this.conf.onTrack !== undefined) {
-      this.conf.onTrack(evt);
-    }
-  }
-
-  #onDataChannel(evt) {
-    if (this.conf.onDataChannel !== undefined) {
-      this.conf.onDataChannel(evt);
-    }
-  }
 }
-
-window.MediaMTXWebRTCReader = MediaMTXWebRTCReader;
