@@ -10,7 +10,7 @@ import MediaMTXViewer from '@/components/MediaMTXViewer.astro'
 This WebRTC/WHEP viewer is adapted (for Astro) from the source of [MediaMTX](https://mediamtx.org/docs/other/embed-streams-in-a-website).
 
 ### Notes
-    - While WHEP signaling (HTTP) happens over a Cloudflare tunnel (cam-rtc.ohn.sh), the media stream itself is transmitted directly from mediamtx on my home network to the browser. This UDP-based NAT "hole-punching" is a primary mechanism of WebRTC.
+    - While WHEP signaling (HTTP) happens over a Cloudflare tunnel (cam-rtc.ohn.sh), the media stream itself is transmitted directly from mediamtx on my home network to the browser.
     - The latency is incredibly low compared to [HLS from the same mediamtx server](https://cam.ohn.sh/thing). That's the whole point of WebRTC, but it's still impressive.
 
 ### TODO
