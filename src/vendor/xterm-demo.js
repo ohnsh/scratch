@@ -1,6 +1,8 @@
-// xterm.js documentation repo
+import { WebglAddon } from '@xterm/addon-webgl'
 
-var baseTheme = {
+// adapted from xterm.js documentation repo
+
+const baseTheme = {
   foreground: '#F8F8F8',
   background: '#2D2E2C',
   selection: '#5DA5D533',
@@ -22,7 +24,7 @@ var baseTheme = {
   brightWhite: '#FFFFFF'
 };
 // vscode-snazzy https://github.com/Tyriar/vscode-snazzy
-var otherTheme = {
+const otherTheme = {
   foreground: '#eff0eb',
   background: '#282a36',
   selection: '#97979b33',
@@ -43,33 +45,44 @@ var otherTheme = {
   white: '#f1f1f0',
   brightWhite: '#eff0eb'
 };
-var isBaseTheme = true;
+let isBaseTheme = true;
+let term
 
-var term = new window.Terminal({
+export function setTerm(t) {
+  term = t
+}
+
+export const demoOptions = {
   fontFamily: '"Cascadia Code", Menlo, monospace',
   theme: baseTheme,
   cursorBlink: true,
   allowProposedApi: true
-});
-term.open(document.querySelector('.demo .inner'));
-
-var isWebglEnabled = false;
-try {
-  const webgl = new window.WebglAddon.WebglAddon();
-  term.loadAddon(webgl);
-  isWebglEnabled = true;
-} catch (e) {
-  console.warn('WebGL addon threw an exception during load', e);
 }
 
-// Cancel wheel events from scrolling the page if the terminal has scrollback
-document.querySelector('.xterm').addEventListener('wheel', e => {
-  if (term.buffer.active.baseY > 0) {
-    e.preventDefault();
+let isWebglEnabled = false;
+export function setupTerm(term) {
+  try {
+    const webgl = new WebglAddon();
+    term.loadAddon(webgl);
+    isWebglEnabled = true;
+  } catch (e) {
+    console.warn('WebGL addon threw an exception during load', e);
   }
-});
 
-function runFakeTerminal() {
+  // Cancel wheel events from scrolling the page if the terminal has scrollback
+  document.querySelector('.xterm').addEventListener('wheel', e => {
+    if (term.buffer.active.baseY > 0) {
+      e.preventDefault();
+    }
+  });
+}
+
+/*
+  var term = new window.Terminal();
+  term.open(document.querySelector('.demo .inner'));
+*/
+  
+export function runFakeTerminal(term) {
   if (term._initialized) {
     return;
   }

@@ -6,16 +6,9 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
-  env: {
-      schema: {
-          YT_API_KEY: envField.string({ context: "server", access: "secret" }),
-      }
-  },
-
   vite: {
     plugins: [tailwindcss()]
   },
-
   integrations: [react(), starlight({ title: '🧪 scratch' })]
 });
 
