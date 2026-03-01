@@ -1,0 +1,25 @@
+---
+import '@xterm/xterm/css/xterm.css'
+import TermF from './TermF'
+
+const { tsx = false } = Astro.props
+---
+
+{ !tsx &&
+    <div id="terminal"></div>
+
+    <script>
+        import { Terminal } from '@xterm/xterm'
+        import * as Demo from '@/vendor/xterm-demo.js'
+
+        const term = new Terminal(Demo.demoOptions)
+        term.open(document.querySelector('#terminal')!)
+        Demo.setTerm(term)
+        Demo.setupTerm(term)
+        Demo.runFakeTerminal(term)
+    </script>
+}
+
+{ tsx &&
+    <TermF client:only="react" />
+}

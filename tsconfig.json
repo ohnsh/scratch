@@ -9,10 +9,13 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react"
