@@ -46,13 +46,12 @@ const flowControl = { limit: 100000, highWater: 10, lowWater: 4 } as FlowControl
 
 const { baseUrl } = Astro.props
 const wsUrl = `${baseUrl}/ws`
-const tokenUrl = `${baseUrl}/token`
+// const tokenUrl = `${baseUrl}/token`
 ---
 
 <TtydTerm
     client:only="react"
     wsUrl={wsUrl}
-    tokenUrl={tokenUrl}
     clientOptions={clientOptions}
     termOptions={termOptions}
     flowControl={flowControl}

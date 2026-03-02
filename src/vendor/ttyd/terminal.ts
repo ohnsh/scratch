@@ -62,7 +62,7 @@ export interface FlowControl {
 
 export interface XtermOptions {
     wsUrl: string;
-    tokenUrl: string;
+    tokenUrl?: string;
     flowControl: FlowControl;
     clientOptions: ClientOptions;
     termOptions: ITerminalOptions;
@@ -131,6 +131,11 @@ export class Xterm {
 
     @bind
     public async refreshToken() {
+        // token thing causes CORS errors on custom front-end. It seems to be undocumented/unconfigurable.
+        // Need to learn more about it, but for now it works with the token empty.
+        if (!this.options.tokenUrl) {
+            return
+        }
         try {
             const resp = await fetch(this.options.tokenUrl);
             if (resp.ok) {
