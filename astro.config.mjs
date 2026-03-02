@@ -1,16 +1,24 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import tailwindcss from "@tailwindcss/vite";
-import react from "@astrojs/react";
-import starlight from "@astrojs/starlight";
+import { defineConfig } from 'astro/config'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@astrojs/react'
+import starlight from '@astrojs/starlight'
+import fs from 'node:fs'
 
 // https://astro.build/config
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ['localhost', 'mini.local'],
+      https: {
+        key: fs.readFileSync('./.cert/mini.local-key.pem'),
+        cert: fs.readFileSync('./.cert/mini.local.pem'),
+      },
+    },
   },
-  integrations: [react(), starlight({ title: "🧪 scratch" })],
-});
+  integrations: [react(), starlight({ title: '🧪 scratch' })],
+})
 
 /** @typedef {import('@astrojs/starlight/types').StarlightUserConfig} StarlightUserConfig */
 /** @type {StarlightUserConfig} */

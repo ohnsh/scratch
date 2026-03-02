@@ -1,0 +1,123 @@
+---
+import MediaMTXViewer from './MediaMTXViewer.astro'
+import RemoteTerm from './RemoteTerm.astro'
+---
+
+<MediaMTXViewer whepUrl="https://cam.ohn.sh/thing/whep" />
+<RemoteTerm baseUrl="https://ttyd.ohn.sh" />
+<button data-ptz-orientation-activate hidden>Activate Orientation Control</button>
+
+<script>
+    declare namespace DeviceOrientationEvent {
+        export function requestPermission(): Promise<'granted' | 'denied' | 'prompt'>
+    }
+    function arrowKeyHandler(e: KeyboardEvent) {
+        if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+            return
+        }
+        switch (e.key) {
+            case 'ArrowUp':
+                ws.send(JSON.stringify({ x: 0, y: -40 }))
+                break
+            case 'ArrowDown':
+                ws.send(JSON.stringify({ x: 0, y: 40 }))
+                break
+            case 'ArrowLeft':
+                ws.send(JSON.stringify({ x: -40, y: 0 }))
+                break
+            case 'ArrowRight':
+                ws.send(JSON.stringify({ x: 40, y: 0 }))
+                break
+            default:
+                return
+        }
+        e.preventDefault()
+    }
+    const ws = new WebSocket('wss://cam.ohn.sh/ptz')
+    ws.onopen = () => {
+        window.addEventListener('keydown', arrowKeyHandler)
+    }
+    ws.onclose = () => {
+        window.removeEventListener('keydown', arrowKeyHandler)
+    }
+
+    type Orientation = { alpha: number; beta: number }
+    if (window.DeviceOrientationEvent) {
+        for (const button of document.querySelectorAll(
+            '[data-ptz-orientation-activate]'
+        ) as NodeListOf<HTMLButtonElement>) {
+            button.hidden = false
+            let running = false
+            let cleanup: () => void
+
+            button.addEventListener('click', async () => {
+                if (!running) {
+                    if (
+                        DeviceOrientationEvent.requestPermission &&
+                        (await DeviceOrientationEvent.requestPermission()) !== 'granted'
+                    ) {
+                        return
+                    }
+                    cleanup = setup()
+                } else {
+                    cleanup?.()
+                }
+                running = !running
+                button.textContent = running ? 'Disconnect Orientation' : 'Connect Orientation'
+            })
+        }
+    }
+
+    function setup() {
+        const ws = new WebSocket('wss://cam.ohn.sh/ptz/abs')
+        const controller = new AbortController()
+        const { signal } = controller
+
+        ws.onopen = () => {
+            let prev: Orientation
+            window.addEventListener(
+                'deviceorientation',
+                (event) => {
+                    const { alpha, beta } = event
+                    if (alpha === null || beta === null) {
+                        return
+                    }
+                    if (!prev) {
+                        prev = { alpha, beta }
+                        return
+                    }
+                    const deltas = computeDeltas(prev, { alpha, beta })
+                    if (deltas.every((delta) => Math.abs(delta) < 5)) {
+                        return
+                    }
+                    ws.send(JSON.stringify({ alpha, beta }))
+                    // ws.send(`x=${Math.round(-alphaDelta * 8)}&y=${Math.round(-betaDelta * 8)}`)
+                    prev = { alpha, beta }
+                },
+                { passive: true, signal }
+            )
+        }
+        ws.onclose = () => {
+            controller.abort()
+        }
+        return () => {
+            ws.close()
+        }
+    }
+
+    function computeDeltas(prev: Orientation, current: Orientation) {
+        let alphaDelta = current.alpha - prev.alpha
+        if (Math.abs(alphaDelta) > 180) {
+            alphaDelta = alphaDelta > 0 ? alphaDelta - 360 : alphaDelta + 360
+        }
+        let betaDelta = current.beta - prev.beta
+        if (Math.abs(betaDelta) > 180) {
+            betaDelta = betaDelta > 0 ? betaDelta - 360 : betaDelta + 360
+        }
+        // let gammaDelta = current.gamma - prev.gamma
+        // if (Math.abs(gammaDelta) > 180) {
+        //     gammaDelta = gammaDelta > 0 ? gammaDelta - 360 : gammaDelta + 360
+        // }
+        return [alphaDelta, betaDelta]
+    }
+</script>
