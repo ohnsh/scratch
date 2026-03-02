@@ -42,18 +42,15 @@ const termOptions = {
     allowProposedApi: true,
 } as ITerminalOptions
 
-const flowControl = {
-    limit: 100000,
-    highWater: 10,
-    lowWater: 4,
-} as FlowControl
+const flowControl = { limit: 100000, highWater: 10, lowWater: 4 } as FlowControl
 
 const { baseUrl } = Astro.props
 const wsUrl = `${baseUrl}/ws`
 const tokenUrl = `${baseUrl}/token`
 ---
-    
-<TtydTerm client:only="react"
+
+<TtydTerm
+    client:only="react"
     wsUrl={wsUrl}
     tokenUrl={tokenUrl}
     clientOptions={clientOptions}

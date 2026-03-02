@@ -4,4 +4,11 @@ const defaultWidth = short ? 281 : 500
 const defaultHeight = short ? 500 : 281
 ---
 
-<iframe width={ width ?? defaultWidth } height={ height ?? defaultHeight } src={`https://www.youtube.com/embed/${v}`} { ...props } frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe
+    width={width ?? defaultWidth}
+    height={height ?? defaultHeight}
+    src={`https://www.youtube.com/embed/${v}`}
+    {...props}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>

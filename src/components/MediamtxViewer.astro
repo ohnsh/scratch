@@ -6,78 +6,78 @@ const { whepUrl } = Astro.props
 <div id="message"></div>
 
 <script>
-import { MediaMTXWebRTCReader } from '@/vendor/mediamtx-whep-reader.js'
+    import { MediaMTXWebRTCReader } from '@/vendor/mediamtx-whep-reader.js'
 
-const video = document.getElementById('video') as HTMLVideoElement;
-const message = document.getElementById('message') as HTMLDivElement;
+    const video = document.getElementById('video') as HTMLVideoElement
+    const message = document.getElementById('message') as HTMLDivElement
 
-const setMessage = (str: string) => {
-  if (str !== '') {
-    video.controls = false;
-  } else {
-    video.controls = defaultControls;
-  }
-  message.innerText = str;
-};
+    const setMessage = (str: string) => {
+        if (str !== '') {
+            video.controls = false
+        } else {
+            video.controls = defaultControls
+        }
+        message.innerText = str
+    }
 
-const parseBoolString = (str: string | null, defaultVal: boolean) => {
-  str = (str || '');
+    const parseBoolString = (str: string | null, defaultVal: boolean) => {
+        str = str || ''
 
-  if (['1', 'yes', 'true'].includes(str.toLowerCase())) {
-    return true;
-  }
-  if (['0', 'no', 'false'].includes(str.toLowerCase())) {
-    return false;
-  }
-  return defaultVal;
-};
+        if (['1', 'yes', 'true'].includes(str.toLowerCase())) {
+            return true
+        }
+        if (['0', 'no', 'false'].includes(str.toLowerCase())) {
+            return false
+        }
+        return defaultVal
+    }
 
-const params = new URLSearchParams(window.location.search);
-video.controls = parseBoolString(params.get('controls'), true);
-video.muted = parseBoolString(params.get('muted'), true);
-video.autoplay = parseBoolString(params.get('autoplay'), true);
-video.playsInline = parseBoolString(params.get('playsinline'), true);
-video.disablePictureInPicture = parseBoolString(params.get('disablepictureinpicture'), false);
-const defaultControls = video.controls;
-const { whepUrl } = video.dataset
+    const params = new URLSearchParams(window.location.search)
+    video.controls = parseBoolString(params.get('controls'), true)
+    video.muted = parseBoolString(params.get('muted'), true)
+    video.autoplay = parseBoolString(params.get('autoplay'), true)
+    video.playsInline = parseBoolString(params.get('playsinline'), true)
+    video.disablePictureInPicture = parseBoolString(params.get('disablepictureinpicture'), false)
+    const defaultControls = video.controls
+    const { whepUrl } = video.dataset
 
-const reader = new MediaMTXWebRTCReader({
-  url: new URL(whepUrl!) + window.location.search,
-  onError: (err) => {
-    setMessage(err);
-  },
-  onTrack: (evt) => {
-    setMessage('');
-    video.srcObject = evt.streams[0];
-  },
-  onDataChannel: (evt) => {
-    evt.channel.binaryType = 'arraybuffer';
-    evt.channel.onmessage = (evt) => {
-      console.log('data channel message', evt.data);
-    };
-  },
-});
+    const reader = new MediaMTXWebRTCReader({
+        url: new URL(whepUrl!) + window.location.search,
+        onError: (err) => {
+            setMessage(err)
+        },
+        onTrack: (evt) => {
+            setMessage('')
+            video.srcObject = evt.streams[0]
+        },
+        onDataChannel: (evt) => {
+            evt.channel.binaryType = 'arraybuffer'
+            evt.channel.onmessage = (evt) => {
+                console.log('data channel message', evt.data)
+            }
+        },
+    })
 
-window.addEventListener('beforeunload', () => reader?.close());
+    window.addEventListener('beforeunload', () => reader?.close())
 </script>
 
 <style>
-#message {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	display: flex;
-	align-items: center;
-	text-align: center;
-	justify-content: center;
-	font-size: 16px;
-	font-weight: bold;
-	color: white;
-	pointer-events: none;
-	padding: 20px;
-	box-sizing: border-box;
-	text-shadow: 0 0 5px black;
-}
+    #message {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        pointer-events: none;
+        padding: 20px;
+        box-sizing: border-box;
+        text-shadow: 0 0 5px black;
+    }
 </style>
