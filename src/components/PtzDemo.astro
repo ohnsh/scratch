@@ -1,13 +1,12 @@
 ---
 import MediaMTXViewer from './MediaMTXViewer.astro'
-import RemoteTerm from './RemoteTerm.astro'
 ---
 
 <MediaMTXViewer whepUrl="https://cam.ohn.sh/thing/whep" />
-<RemoteTerm baseUrl="https://ttyd.ohn.sh" />
 <button data-ptz-orientation-activate hidden>Activate Orientation Control</button>
 
 <script>
+    // monkey-patch experimental DOM API to silence typescript.
     declare namespace DeviceOrientationEvent {
         export function requestPermission(): Promise<'granted' | 'denied' | 'prompt'>
     }
