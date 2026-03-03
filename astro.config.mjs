@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@astrojs/react'
 import starlight from '@astrojs/starlight'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import fs from 'node:fs'
 
 // https://astro.build/config
@@ -18,6 +20,10 @@ export default defineConfig({
     },
   },
   integrations: [react(), starlight({ title: '🧪 scratch' })],
+  markdown: {
+	remarkPlugins: [remarkMath],
+	rehypePlugins: [rehypeKatex],
+  },
 })
 
 /** @typedef {import('@astrojs/starlight/types').StarlightUserConfig} StarlightUserConfig */
