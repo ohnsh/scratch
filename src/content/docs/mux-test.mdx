@@ -1,0 +1,23 @@
+---
+title: video player test
+---
+
+import { MuxPlayer } from '@mux/mux-player-astro'
+import { CldVideoPlayer } from 'astro-cloudinary'
+
+## Cloudinary \<CldVideoPlayer>
+<CldVideoPlayer src="IMG_0417_ptseod" />
+
+## Mux \<MuxPlayer>
+<MuxPlayer
+    playbackId="XjuWbWRYCwsl8EP18S9yukKJncwK8JaDX9LO019Cm3Ko"
+    metadata={{ video_title: 'Test' }}
+    style={{
+        display: 'block',
+        aspectRatio: '16/9',
+        backgroundColor: '#000',
+        margin: '1rem 0 2rem',
+    }}
+    accentColor="#4e5e99"
+    defaultShowRemainingTime={true}
+/>
