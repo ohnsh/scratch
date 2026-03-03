@@ -1,7 +1,5 @@
 ---
-import BaseLayout from '@/layouts/OpBase.astro'
 import { YouTube } from '@astro-community/astro-embed-youtube'
-import YTicon from '@/assets/youtube.svg'
 
 const key = import.meta.env.YT_API_KEY
 
@@ -30,19 +28,16 @@ const { items: videos, pageInfo } = await getVideos(playlistId)
 const { totalResults, resultsPerPage } = pageInfo
 ---
 
-<BaseLayout title="YouTube Data API Loader">
-	<YTicon fill="#ccc" />
-	<p>{resultsPerPage} of {totalResults}</p>
-	{videos.map(
-		({ snippet }) => {
-			const { title, publishedAt, description } = snippet
-			const { videoId } = snippet.resourceId
-			return (
-				<YouTube id={videoId} posterQuality="max" />
-				<p><a href={`https://youtu.be/${videoId}`}>{title}</a></p>
-				<p>{description}</p>
-				<p>{(new Date(publishedAt)).toLocaleDateString()}</p>
-			)
-		}
-	)}
-</BaseLayout>
+<p>{resultsPerPage} of {totalResults}</p>
+{videos.map(
+    ({ snippet }) => {
+        const { title, publishedAt, description } = snippet
+        const { videoId } = snippet.resourceId
+        return (
+            <YouTube id={videoId} posterQuality="max" />
+            <p><a href={`https://youtu.be/${videoId}`}>{title}</a></p>
+            <p>{description}</p>
+            <p>{(new Date(publishedAt)).toLocaleDateString()}</p>
+        )
+    }
+)}

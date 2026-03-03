@@ -9,21 +9,35 @@ import fs from 'node:fs'
 
 // https://astro.build/config
 export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-    server: {
-      allowedHosts: ['localhost', 'mini.local'],
-      https: {
-        key: fs.readFileSync('./.cert/mini.local-key.pem'),
-        cert: fs.readFileSync('./.cert/mini.local.pem'),
-      },
+    vite: {
+        plugins: [tailwindcss()],
+        server: {
+            allowedHosts: ['localhost', 'mini.local'],
+            https: {
+                key: fs.readFileSync('./.cert/mini.local-key.pem'),
+                cert: fs.readFileSync('./.cert/mini.local.pem'),
+            },
+        },
     },
-  },
-  integrations: [react(), starlight({ title: '🧪 scratch' })],
-  markdown: {
-	remarkPlugins: [remarkMath],
-	rehypePlugins: [rehypeKatex],
-  },
+    integrations: [
+        react(),
+        starlight({
+            title: '🧪 scratch',
+            sidebar: [
+				{ slug: 'ptz-demo', badge: 'new' },
+				'webrtc-demo',
+				'mux-test',
+				'ttyd-demo',
+				'youtube-rss',
+				'youtube-data-api',
+				{ label: 'Log', items: [
+					{ label: 'March', autogenerate: { directory: '2026/mar' } },
+					{ label: 'February', autogenerate: { directory: '2026/feb' }, collapsed: true },
+				]}
+			],
+        }),
+    ],
+    markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
 })
 
 /** @typedef {import('@astrojs/starlight/types').StarlightUserConfig} StarlightUserConfig */
