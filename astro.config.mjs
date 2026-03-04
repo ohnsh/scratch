@@ -31,6 +31,7 @@ export default defineConfig({
 			// favicon value always rendered after custom tags, so it needs to be the preferred icon.
 			favicon: '/flask-conical.svg',
             sidebar: [
+				'yolo-demo',
 				{ slug: 'ptz-demo', badge: 'new' },
 				'webrtc-demo',
 				'mux-test',
