@@ -1,20 +1,31 @@
 ---
+
 ---
 
-<video class="cc-user-media"></video>
+<div class="cc-user-media">
+    <video></video>
+</div>
 
 <script>
     for (const $c of document.querySelectorAll('.cc-user-media')) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-            const video = $c as HTMLVideoElement
-            video.srcObject = stream;
-            video.onloadedmetadata = () => {
-                video.play();
-            };
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+            devices.forEach(device => {
+                const p = document.createElement('p')
+                p.textContent = `${device.kind}: ${device.label} id = ${device.deviceId}`
+                $c.appendChild(p)
+            })
         })
-        .catch((error) => {
-            console.error('Error accessing user media:', error);
-        });
+        navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((stream) => {
+                const video = $c.querySelector('video') as HTMLVideoElement
+                video.srcObject = stream
+                video.onloadedmetadata = () => {
+                    video.play()
+                }
+            })
+            .catch((error) => {
+                console.error('Error accessing user media:', error)
+            })
     }
 </script>
