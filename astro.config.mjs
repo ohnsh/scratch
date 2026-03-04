@@ -28,11 +28,12 @@ export default defineConfig({
 				'webrtc-demo',
 				'mux-test',
 				'ttyd-demo',
-				'youtube-rss',
 				'youtube-data-api',
+				'youtube-rss',
 				{ label: 'Log', items: [
 					{ label: 'March', autogenerate: { directory: '2026/mar' } },
 					{ label: 'February', autogenerate: { directory: '2026/feb' }, collapsed: true },
+					{ label: 'January', autogenerate: { directory: '2026/jan' }, collapsed: true },
 				]}
 			],
         }),
