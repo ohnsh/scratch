@@ -22,7 +22,14 @@ export default defineConfig({
     integrations: [
         react(),
         starlight({
-            title: '🧪 scratch',
+            title: 'scratch',
+			logo: { replacesTitle: true, dark: '@/assets/flask-conical-dark.svg', light: '@/assets/flask-conical-light.svg' },
+			head: [
+				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '32x32' } },
+				{ tag: 'link', attrs: { rel: 'icon', href: '/flask-conical.png', type: 'image/png' } },
+			],
+			// favicon value always rendered after custom tags, so it needs to be the preferred icon.
+			favicon: '/flask-conical.svg',
             sidebar: [
 				{ slug: 'ptz-demo', badge: 'new' },
 				'webrtc-demo',
@@ -30,7 +37,7 @@ export default defineConfig({
 				'ttyd-demo',
 				'youtube-data-api',
 				'youtube-rss',
-				{ label: 'Log', items: [
+				{ label: 'log', items: [
 					{ label: 'March', autogenerate: { directory: '2026/mar' } },
 					{ label: 'February', autogenerate: { directory: '2026/feb' }, collapsed: true },
 					{ label: 'January', autogenerate: { directory: '2026/jan' }, collapsed: true },
