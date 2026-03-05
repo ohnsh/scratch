@@ -24,7 +24,8 @@ const loader: Loader = {
 
 const opts: Parameters<typeof docsSchema>[0] = {
     extend: z.object({
-		date: z.date().optional()
+		date: z.date().optional(),
+        ogImage: z.string().url().optional(),
 	})
 	// }).transform(({ date }) => ({
 	// 	date: date?.toISOString(),

@@ -23,6 +23,8 @@ export default defineConfig({
         react(),
         starlight({
             title: 'scratch',
+			lastUpdated: true,
+			routeMiddleware: '@/routeData.ts',
 			logo: { replacesTitle: true, dark: '@/assets/flask-conical-dark.svg', light: '@/assets/flask-conical-light.svg' },
 			head: [
 				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '32x32' } },
