@@ -33,13 +33,15 @@ export default defineConfig({
 			// favicon value always rendered after custom tags, so it needs to be the preferred icon.
 			favicon: '/flask-conical.svg',
             sidebar: [
-				'yolo-demo',
-				{ slug: 'ptz-demo', badge: 'new' },
-				'webrtc-demo',
-				'mux-test',
-				'ttyd-demo',
-				'youtube-data-api',
-				'youtube-rss',
+				{ label: 'scratch', items: [
+					'yolo-demo',
+					{ slug: 'ptz-demo', badge: 'new' },
+					'webrtc-demo',
+					'mux-test',
+					'ttyd-demo',
+					'youtube-data-api',
+					'youtube-rss',
+				]},
 				{ label: 'log', items: [
 					{ label: 'March', autogenerate: { directory: '2026/mar' } },
 					{ label: 'February', autogenerate: { directory: '2026/feb' }, collapsed: true },
