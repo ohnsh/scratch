@@ -24,7 +24,6 @@ export default defineConfig({
         starlight({
             title: 'scratch',
 			lastUpdated: true,
-			routeMiddleware: '@/routeData.ts',
 			logo: { replacesTitle: true, dark: '@/assets/flask-conical-dark.svg', light: '@/assets/flask-conical-light.svg' },
 			head: [
 				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '32x32' } },
@@ -42,11 +41,16 @@ export default defineConfig({
 					'youtube-data-api',
 					'youtube-rss',
 				]},
-				{ label: 'log', items: [
-					{ label: 'March', autogenerate: { directory: '2026/mar' } },
-					{ label: 'February', autogenerate: { directory: '2026/feb' }, collapsed: true },
-					{ label: 'January', autogenerate: { directory: '2026/jan' }, collapsed: true },
-				]}
+				{
+					label: 'days.ohn.sh',
+					link: 'https://days.ohn.sh',
+					attrs: { target: '_blank' },
+				},
+				{
+					label: 'j.ohn.sh',
+					link: 'https://j.ohn.sh',
+					attrs: { target: '_blank' },
+				}
 			],
         }),
     ],
