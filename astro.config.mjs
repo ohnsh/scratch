@@ -42,15 +42,16 @@ export default defineConfig({
         { icon: 'instagram', label: 'Instagram', href: 'https://instagram.com/j.ohn.sh' },
       ],
       sidebar: [
+        { slug: 'ptz-demo', badge: 'new' },
+        'youtube-data-api',
+        'yolo-demo',
         {
           label: 'scratch',
+          collapsed: true,
           items: [
-            { slug: 'ptz-demo', badge: 'new' },
             'webrtc-demo',
-            'yolo-demo',
             'mux-test',
             'ttyd-demo',
-            'youtube-data-api',
             'youtube-rss',
           ],
         },

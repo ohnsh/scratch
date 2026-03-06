@@ -1,4 +1,5 @@
 :root {
+  /* srcery/ghostty palette */
   --srcery-0: #1c1b19;
   --srcery-1: #ef2f27;
   --srcery-2: #519f50;
@@ -21,9 +22,11 @@
 }
 
 :root {
+  /* srcery-15: oklch(0.94 0.05 82.83) */
+  /* srcery-12: oklch(0.71 0.11 248.13) */
 	--sl-color-accent-low: #00273d;
   --sl-color-accent: var(--srcery-4);
-  --sl-color-accent-high: var(--srcery-12);
+  --sl-color-accent-high: oklch(.90 .15 270);
   --sl-color-white: #eeeded;
   --sl-color-gray-1: #eeeded;
   --sl-color-gray-2: #eeeded;
