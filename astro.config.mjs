@@ -54,7 +54,11 @@ export default defineConfig({
             'youtube-rss',
           ],
         },
-        { label: 'days.ohn.sh', link: 'https://days.ohn.sh', attrs: { target: '_blank' } },
+        {
+          label: 'days.ohn.sh',
+          link: 'https://days.ohn.sh',
+          attrs: { target: '_blank', style: 'margin-top: 2em' },
+        },
         { label: 'j.ohn.sh', link: 'https://j.ohn.sh', attrs: { target: '_blank' } },
       ],
     }),
