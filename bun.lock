@@ -31,6 +31,7 @@
         "react-dom": "^19.2.4",
         "rehype-katex": "^7.0.1",
         "remark-math": "^6.0.0",
+        "starlight-theme-flexoki": "^0.2.2",
         "tailwind-merge": "^3.5.0",
         "tailwindcss": "^4.2.1",
       },
@@ -1766,6 +1767,8 @@
     "source-map-js": ["source-map-js@1.2.1", "", {}, "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="],
 
     "space-separated-tokens": ["space-separated-tokens@2.0.2", "", {}, "sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q=="],
+
+    "starlight-theme-flexoki": ["starlight-theme-flexoki@0.2.2", "", { "peerDependencies": { "@astrojs/starlight": ">=0.34" } }, "sha512-WIgWwRqK5m1fhzcKJ+dSQ31puY6NW8HoYvSLL3EOPp9QlNXaX2QxjiViR9nIpWUbo3rq+6HqY//WJid19F3QWQ=="],
 
     "statuses": ["statuses@2.0.2", "", {}, "sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw=="],
 

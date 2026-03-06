@@ -5,6 +5,7 @@ import react from '@astrojs/react'
 import starlight from '@astrojs/starlight'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
+import flexoki from 'starlight-theme-flexoki'
 import fs from 'node:fs'
 
 // https://astro.build/config
@@ -22,6 +23,7 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
+      plugins: [flexoki()],
       title: 'scratch',
       lastUpdated: true,
       logo: {
@@ -48,12 +50,13 @@ export default defineConfig({
           attrs: { target: '_blank', class: 'author' },
         },
         { slug: 'ptz-demo', badge: 'new' },
-        'youtube-data-api',
+        'ttyd-demo',
         'yolo-demo',
+        'youtube-data-api',
         {
           label: 'scratch',
           collapsed: true,
-          items: ['webrtc-demo', 'mux-test', 'ttyd-demo', 'youtube-rss'],
+          items: ['webrtc-demo', 'youtube-rss'],
         },
         {
           label: 'days.ohn.sh',
