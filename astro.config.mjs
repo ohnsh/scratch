@@ -42,25 +42,29 @@ export default defineConfig({
         { icon: 'instagram', label: 'Instagram', href: 'https://instagram.com/j.ohn.sh' },
       ],
       sidebar: [
+        {
+          label: 'John Sherrell',
+          link: 'https://j.ohn.sh',
+          attrs: { target: '_blank', class: 'author' },
+        },
         { slug: 'ptz-demo', badge: 'new' },
         'youtube-data-api',
         'yolo-demo',
         {
           label: 'scratch',
           collapsed: true,
-          items: [
-            'webrtc-demo',
-            'mux-test',
-            'ttyd-demo',
-            'youtube-rss',
-          ],
+          items: ['webrtc-demo', 'mux-test', 'ttyd-demo', 'youtube-rss'],
         },
         {
           label: 'days.ohn.sh',
           link: 'https://days.ohn.sh',
           attrs: { target: '_blank', style: 'margin-top: 2em' },
         },
-        { label: 'j.ohn.sh', link: 'https://j.ohn.sh', attrs: { target: '_blank' } },
+        {
+          label: 'j.ohn.sh',
+          link: 'https://j.ohn.sh',
+          attrs: { target: '_blank' },
+        },
       ],
     }),
   ],
@@ -69,20 +73,3 @@ export default defineConfig({
 
 /** @typedef {import('@astrojs/starlight/types').StarlightUserConfig} StarlightUserConfig */
 /** @type {StarlightUserConfig} */
-/* starlight({
-	title: 'My Docs',
-	social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
-	sidebar: [
-		{
-			label: 'Guides',
-			items: [
-				// Each item here is one entry in the navigation menu.
-				{ label: 'Example Guide', slug: 'guides/example' },
-			],
-		},
-		{
-			label: 'Reference',
-			autogenerate: { directory: 'reference' },
-		},
-	],
-}) */
