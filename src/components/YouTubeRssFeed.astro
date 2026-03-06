@@ -15,19 +15,19 @@ const uploads = 'UUFpptpegJ_Ys54PGYwTYPPg'
 <p><a href={author.uri}>channel</a></p>
 
 <iframe width="560" height="315" title="Play"
-	allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-	allowfullscreen="" referrerpolicy="strict-origin-when-cross-origin"
-	src={`https://www.youtube-nocookie.com/embed/?list=${uploads}&amp;playsinline=1`}>
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen="" referrerpolicy="strict-origin-when-cross-origin"
+  src={`https://www.youtube-nocookie.com/embed/?list=${uploads}&amp;playsinline=1`}>
 </iframe>
 <!--<YouTube id="" params={`list=${uploads}`} posterQuality="max" />-->
 
 { entries.map((entry) => {
-		const { 'yt:videoId': id, link: {'@_href': link}, title, published } = entry
-		// params=querystring (https://developers.google.com/youtube/player_parameters#Parameters)
-		// title=overlay text
-		return (
-			<YouTube id={id} posterQuality="max" />
-			<p><a href={link}>{title}</a></p>
-			<p>{(new Date(published)).toLocaleDateString()}</p>
-		)
+    const { 'yt:videoId': id, link: {'@_href': link}, title, published } = entry
+    // params=querystring (https://developers.google.com/youtube/player_parameters#Parameters)
+    // title=overlay text
+    return (
+      <YouTube id={id} posterQuality="max" />
+      <p><a href={link}>{title}</a></p>
+      <p>{(new Date(published)).toLocaleDateString()}</p>
+    )
 }) }

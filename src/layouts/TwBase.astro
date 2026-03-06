@@ -3,11 +3,11 @@ import '@/styles/global.css'
 import BaseLayout from './Base.astro'
 
 interface Props {
-    title: string,
-    class?: string,
+  title: string
+  class?: string
 }
 ---
 
 <BaseLayout {...Astro.props}>
-    <slot />
+  <slot />
 </BaseLayout>

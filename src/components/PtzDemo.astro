@@ -6,131 +6,131 @@ import MediaMTXViewer from './MediaMTXViewer.astro'
 <button data-ptz-orientation-activate hidden>Activate Orientation Control</button>
 
 <script>
-    // monkey-patch experimental DOM API to silence typescript.
-    declare namespace DeviceOrientationEvent {
-        export function requestPermission(): Promise<'granted' | 'denied' | 'prompt'>
+  // monkey-patch experimental DOM API to silence typescript.
+  declare namespace DeviceOrientationEvent {
+    export function requestPermission(): Promise<'granted' | 'denied' | 'prompt'>
+  }
+
+  function startKeyControl() {
+    const ws = new WebSocket('wss://cam.ohn.sh/ptz')
+    ws.onopen = () => {
+      window.addEventListener('keydown', arrowKeyHandler)
     }
-
-    function startKeyControl() {
-        const ws = new WebSocket('wss://cam.ohn.sh/ptz')
-        ws.onopen = () => {
-            window.addEventListener('keydown', arrowKeyHandler)
-        }
-        ws.onclose = () => {
-            window.removeEventListener('keydown', arrowKeyHandler)
-        }
-        return ws
+    ws.onclose = () => {
+      window.removeEventListener('keydown', arrowKeyHandler)
     }
+    return ws
+  }
 
-    let keySocket: WebSocket | undefined = startKeyControl()
+  let keySocket: WebSocket | undefined = startKeyControl()
 
-    function arrowKeyHandler(e: KeyboardEvent) {
-        if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+  function arrowKeyHandler(e: KeyboardEvent) {
+    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+      return
+    }
+    if (!keySocket || keySocket.readyState !== WebSocket.OPEN) {
+      return
+    }
+    switch (e.key) {
+      case 'ArrowUp':
+        keySocket.send(JSON.stringify({ x: 0, y: -40 }))
+        break
+      case 'ArrowDown':
+        keySocket.send(JSON.stringify({ x: 0, y: 40 }))
+        break
+      case 'ArrowLeft':
+        keySocket.send(JSON.stringify({ x: -40, y: 0 }))
+        break
+      case 'ArrowRight':
+        keySocket.send(JSON.stringify({ x: 40, y: 0 }))
+        break
+      default:
+        return
+    }
+    e.preventDefault()
+  }
+
+  if (window.DeviceOrientationEvent) {
+    for (const button of document.querySelectorAll(
+      '[data-ptz-orientation-activate]'
+    ) as NodeListOf<HTMLButtonElement>) {
+      button.hidden = false
+      let running = false
+      let cleanup: () => void
+
+      button.addEventListener('click', async () => {
+        if (!running) {
+          if (
+            DeviceOrientationEvent.requestPermission &&
+            (await DeviceOrientationEvent.requestPermission()) !== 'granted'
+          ) {
             return
+          }
+          keySocket?.close()
+          keySocket = undefined
+          cleanup = setup()
+        } else {
+          cleanup?.()
+          keySocket?.close()
+          keySocket = startKeyControl()
         }
-        if (!keySocket || keySocket.readyState !== WebSocket.OPEN) {
+        running = !running
+        button.textContent = running ? 'Disconnect Orientation' : 'Connect Orientation'
+      })
+    }
+  }
+
+  type Orientation = { alpha: number; beta: number }
+  function setup() {
+    const ws = new WebSocket('wss://cam.ohn.sh/ptz/abs')
+    const controller = new AbortController()
+    const { signal } = controller
+
+    ws.onopen = () => {
+      let prev: Orientation
+      window.addEventListener(
+        'deviceorientation',
+        (event) => {
+          const { alpha, beta } = event
+          if (alpha === null || beta === null) {
             return
-        }
-        switch (e.key) {
-            case 'ArrowUp':
-                keySocket.send(JSON.stringify({ x: 0, y: -40 }))
-                break
-            case 'ArrowDown':
-                keySocket.send(JSON.stringify({ x: 0, y: 40 }))
-                break
-            case 'ArrowLeft':
-                keySocket.send(JSON.stringify({ x: -40, y: 0 }))
-                break
-            case 'ArrowRight':
-                keySocket.send(JSON.stringify({ x: 40, y: 0 }))
-                break
-            default:
-                return
-        }
-        e.preventDefault()
+          }
+          if (!prev) {
+            prev = { alpha, beta }
+            return
+          }
+          const deltas = computeDeltas(prev, { alpha, beta })
+          if (deltas.every((delta) => Math.abs(delta) < 5)) {
+            return
+          }
+          ws.send(JSON.stringify({ alpha, beta }))
+          // ws.send(`x=${Math.round(-alphaDelta * 8)}&y=${Math.round(-betaDelta * 8)}`)
+          prev = { alpha, beta }
+        },
+        { passive: true, signal }
+      )
     }
-
-    if (window.DeviceOrientationEvent) {
-        for (const button of document.querySelectorAll(
-            '[data-ptz-orientation-activate]'
-        ) as NodeListOf<HTMLButtonElement>) {
-            button.hidden = false
-            let running = false
-            let cleanup: () => void
-
-            button.addEventListener('click', async () => {
-                if (!running) {
-                    if (
-                        DeviceOrientationEvent.requestPermission &&
-                        (await DeviceOrientationEvent.requestPermission()) !== 'granted'
-                    ) {
-                        return
-                    }
-                    keySocket?.close()
-                    keySocket = undefined
-                    cleanup = setup()
-                } else {
-                    cleanup?.()
-                    keySocket?.close()
-                    keySocket = startKeyControl()
-                }
-                running = !running
-                button.textContent = running ? 'Disconnect Orientation' : 'Connect Orientation'
-            })
-        }
+    ws.onclose = () => {
+      controller.abort()
     }
-
-    type Orientation = { alpha: number; beta: number }
-    function setup() {
-        const ws = new WebSocket('wss://cam.ohn.sh/ptz/abs')
-        const controller = new AbortController()
-        const { signal } = controller
-
-        ws.onopen = () => {
-            let prev: Orientation
-            window.addEventListener(
-                'deviceorientation',
-                (event) => {
-                    const { alpha, beta } = event
-                    if (alpha === null || beta === null) {
-                        return
-                    }
-                    if (!prev) {
-                        prev = { alpha, beta }
-                        return
-                    }
-                    const deltas = computeDeltas(prev, { alpha, beta })
-                    if (deltas.every((delta) => Math.abs(delta) < 5)) {
-                        return
-                    }
-                    ws.send(JSON.stringify({ alpha, beta }))
-                    // ws.send(`x=${Math.round(-alphaDelta * 8)}&y=${Math.round(-betaDelta * 8)}`)
-                    prev = { alpha, beta }
-                },
-                { passive: true, signal }
-            )
-        }
-        ws.onclose = () => {
-            controller.abort()
-        }
-        return () => {
-            ws.close()
-        }
+    return () => {
+      ws.close()
     }
+  }
 
-    function computeDeltas(prev: Orientation, current: Orientation) {
-        let alphaDelta = current.alpha - prev.alpha
-        if (Math.abs(alphaDelta) > 180) {
-            alphaDelta = alphaDelta > 0 ? alphaDelta - 360 : alphaDelta + 360
-        }
-        let betaDelta = current.beta - prev.beta
-        if (Math.abs(betaDelta) > 180) {
-            betaDelta = betaDelta > 0 ? betaDelta - 360 : betaDelta + 360
-        }
-        // let gammaDelta = current.gamma - prev.gamma
-        // if (Math.abs(gammaDelta) > 180) {
-        //     gammaDelta = gammaDelta > 0 ? gammaDelta - 360 : gammaDelta + 360
-        // }
-        return [alphaDelta, betaDelta]
+  function computeDeltas(prev: Orientation, current: Orientation) {
+    let alphaDelta = current.alpha - prev.alpha
+    if (Math.abs(alphaDelta) > 180) {
+      alphaDelta = alphaDelta > 0 ? alphaDelta - 360 : alphaDelta + 360
     }
+    let betaDelta = current.beta - prev.beta
+    if (Math.abs(betaDelta) > 180) {
+      betaDelta = betaDelta > 0 ? betaDelta - 360 : betaDelta + 360
+    }
+    // let gammaDelta = current.gamma - prev.gamma
+    // if (Math.abs(gammaDelta) > 180) {
+    //     gammaDelta = gammaDelta > 0 ? gammaDelta - 360 : gammaDelta + 360
+    // }
+    return [alphaDelta, betaDelta]
+  }
 </script>

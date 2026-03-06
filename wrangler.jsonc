@@ -3,13 +3,8 @@
   "name": "scratch",
   "compatibility_date": "2026-02-22",
   "workers_dev": true,
-  "assets": {
-    "directory": "./dist"
-  },
+  "assets": { "directory": "./dist" },
   "routes": [
-    {
-      "pattern": "scratch.ohn.sh",
-      "custom_domain": true
-    }
-  ]
+    { "pattern": "scratch.ohn.sh", "custom_domain": true }
+  ],
 }

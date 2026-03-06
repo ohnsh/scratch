@@ -1,5 +1,4 @@
 import { defineCollection, z } from 'astro:content'
-import type { Loader } from 'astro/loaders'
 import { docsLoader } from '@astrojs/starlight/loaders'
 import { docsSchema } from '@astrojs/starlight/schema'
 
