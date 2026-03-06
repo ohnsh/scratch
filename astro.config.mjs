@@ -29,12 +29,18 @@ export default defineConfig({
         dark: '@/assets/flask-conical-dark.svg',
         light: '@/assets/flask-conical-light.svg',
       },
+      customCss: ['@/styles/global-sl.css'],
       head: [
         { tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '32x32' } },
         { tag: 'link', attrs: { rel: 'icon', href: '/flask-conical.png', type: 'image/png' } },
       ],
       // favicon value always rendered after custom tags, so it needs to be the preferred icon.
       favicon: '/flask-conical.svg',
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/ohnsh/scratch' },
+        { icon: 'youtube', label: 'YouTube', href: 'https://youtube.com/@ohn-sh' },
+        { icon: 'instagram', label: 'Instagram', href: 'https://instagram.com/j.ohn.sh' },
+      ],
       sidebar: [
         {
           label: 'scratch',

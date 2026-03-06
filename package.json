@@ -6,7 +6,8 @@
     "dev": "astro dev --port 4323 --host",
     "build": "astro build",
     "preview": "astro preview --port 4323 --host",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
     "@astro-community/astro-embed-youtube": "^0.5.10",
