@@ -52,6 +52,7 @@ export default defineConfig({
         { slug: 'ptz-demo', badge: 'new' },
         'ttyd-demo',
         'yolo-demo',
+        'github-days',
         'youtube-data-api',
         {
           label: 'scratch',
