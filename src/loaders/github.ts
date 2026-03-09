@@ -1,12 +1,11 @@
 import type { Loader } from 'astro/loaders'
-
-const dataDir = '../../.days/github'
+import repos from '../../.days/github/repos.json'
+const commitDb = import.meta.glob('../../.days/github/commits/*.json', { eager: true })
 
 export function githubDays(): Loader {
   return {
     name: 'github',
     load: async ({ store }) => {
-      const { default: repos } = await import(`${dataDir}/repos.json`)
       const dayMap = {}
       for (const repo of repos) {
         const repoDayMap = await getRepoDays(repo)
@@ -31,7 +30,9 @@ export function githubDays(): Loader {
 
 async function getRepoDays(repo) {
   const { name } = repo
-  const { default: commits } = await import(`${dataDir}/commits/${name}.json`)
+  const path = `../../.days/github/commits/${name}.json`
+  const { default: commits } = commitDb[path]
+
   if (!Array.isArray(commits)) {
     return {}
   }
