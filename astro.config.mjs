@@ -23,7 +23,7 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
-      plugins: [flexoki()],
+      plugins: [flexoki({ accentColor: 'blue' })],
       title: 'scratch',
       lastUpdated: true,
       logo: {

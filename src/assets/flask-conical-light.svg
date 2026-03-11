@@ -3,7 +3,7 @@
     <path d="M6.453 15h11.094"/>
     <path d="M8.5 2h7"/>
     <style>
-        svg { stroke: #1c6c66; }
+        svg { stroke: #1a4f8c; }
         /* @media (prefers-color-scheme) not supported in embedded SVGs in Safari. */
     </style>
 </svg>
