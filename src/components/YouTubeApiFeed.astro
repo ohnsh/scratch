@@ -1,43 +1,22 @@
 ---
-import { YouTube } from '@astro-community/astro-embed-youtube'
+import { getCollection } from 'astro:content'
+import Video from './LiteYTVideo.astro'
 
-const key = import.meta.env.YT_API_KEY
-
-async function getPlaylist() {
-  const forHandle = 'ohn-sh'
-  const url = new URL('https://youtube.googleapis.com/youtube/v3/channels')
-  const params = { part: "snippet,contentDetails,statistics", forHandle, key }
-  url.search = `${new URLSearchParams(params)}`
-  const json = await fetch(url, { headers: { 'Accept': 'application/json' } }).then(res => res.json())
-  const [ channel ] = json.items
-  return channel.contentDetails.relatedPlaylists.uploads
-}
-
-async function getVideos(playlistId: string) {
-  const url = new URL('https://www.googleapis.com/youtube/v3/playlistItems')
-  // pageToken
-  const params = { part: "snippet", playlistId, maxResults: "20", key }
-  url.search = `${new URLSearchParams(params)}`
-  const json = await fetch(url, { headers: { 'Accept': 'application/json' } }).then(res => res.json())
-  return json
-}
-
-const playlistId = await getPlaylist()
-// https://developers.google.com/youtube/v3/docs/playlistItems#resource
-const { items: videos, pageInfo } = await getVideos(playlistId)
-const { totalResults, resultsPerPage } = pageInfo
+const days = await getCollection('youtube')
+days.sort((a, b) => b.id.localeCompare(a.id))
 ---
 
-<p>{resultsPerPage} of {totalResults}</p>
-{videos.map(
-    ({ snippet }: { snippet: any }) => {
-        const { title, publishedAt, description } = snippet
-        const { videoId } = snippet.resourceId
-        return (
-            <YouTube id={videoId} posterQuality="max" />
-            <p><a href={`https://youtu.be/${videoId}`}>{title}</a></p>
-            <p>{description}</p>
-            <p>{(new Date(publishedAt)).toLocaleDateString()}</p>
-        )
-    }
-)}
+{
+  days.map(({ id: day, data }) => {
+    return (
+      <article>
+        <details>
+          <summary>{day}</summary>
+          {data.map((video) => {
+            return <Video {...video} />
+          })}
+        </details>
+      </article>
+    )
+  })
+}
