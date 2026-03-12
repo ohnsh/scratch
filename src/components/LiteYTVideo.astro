@@ -1,11 +1,15 @@
 ---
 import { YouTube } from '@astro-community/astro-embed-youtube'
-const { title, description, videoId, publishedAt } = Astro.props
-const date = new Date(publishedAt).toLocaleDateString('en-US', { dateStyle: "medium" })
+const { title, description, videoId, publishedAt, isShort, naked = false } = Astro.props
+const date = new Date(publishedAt).toLocaleDateString('en-US', { dateStyle: 'medium' })
 ---
 
 <YouTube id={videoId} posterQuality="max" />
-<p><a href={`https://youtu.be/${videoId}`}>{title}</a><span>Published: {date}</span></p>
+<p>
+  <a href={`https://youtu.be/${videoId}`}>{title}</a><span>Published: {date}</span>{
+    isShort && <span>(short)</span>
+  }
+</p>
 {description && <p>{description}</p>}
 
 <style>

@@ -1,22 +1,18 @@
 ---
 import { getCollection } from 'astro:content'
-import Video from './LiteYTVideo.astro'
+import YTDay from './YTDay.astro'
 
 const days = await getCollection('youtube')
 days.sort((a, b) => b.id.localeCompare(a.id))
 ---
 
 {
-  days.map(({ id: day, data }) => {
+  days.map(day => {
     return (
-      <article>
         <details>
-          <summary>{day}</summary>
-          {data.map((video) => {
-            return <Video {...video} />
-          })}
+          <summary>{day.id}</summary>
+          <YTDay {day} sort="🏃‍♂️" />
         </details>
-      </article>
     )
   })
 }

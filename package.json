@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@astro-community/astro-embed-youtube": "^0.5.10",
-    "@astrojs/react": "5.0.0",
-    "@astrojs/starlight": "0.38.0",
+    "@astrojs/react": "^5.0.0",
+    "@astrojs/starlight": "^0.38.1",
     "@mux/mux-player-astro": "^3.11.5",
     "@xterm/addon-canvas": "^0.7.0",
     "@xterm/addon-clipboard": "^0.2.0",
