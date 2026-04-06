@@ -25,7 +25,7 @@ export default defineConfig({
     starlight({
       plugins: [flexoki({ accentColor: 'blue' })],
       title: 'scratch',
-      lastUpdated: true,
+      lastUpdated: false,
       logo: {
         replacesTitle: true,
         dark: '@/assets/flask-conical-dark.svg',
@@ -52,6 +52,7 @@ export default defineConfig({
         { slug: 'ptz-demo', badge: 'new' },
         'ttyd-demo',
         'yolo-demo',
+        'icloud-demo',
         'github-days',
         'youtube-data-api',
         {
