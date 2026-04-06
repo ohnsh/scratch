@@ -1,0 +1,65 @@
+---
+import getICloudAlbum from '@/loaders/icloud'
+
+const token = 'B1dG4Tcsm1txzgH'
+
+const { webstream, webasseturls } = await getICloudAlbum(token)
+
+const photos = webstream.photos.filter(
+  ({ mediaAssetType = '' }) => mediaAssetType !== 'video'
+).map((photo) => {
+  const [largest] = Object.values(photo.derivatives).sort((a, b) => Number(b.width) - Number(a.width))
+  return largest
+})
+
+const videos = webstream.photos.filter(
+  ({ mediaAssetType = '' }) => mediaAssetType === 'video'
+).map((video) => {
+  const poster = video.derivatives.PosterFrame
+  const sortedVids = Object.entries(video.derivatives)
+    .filter(([key]) => !Number.isNaN(parseInt(key)))  // key !== 'PosterFrame')
+    .sort(([a], [b]) => parseInt(b) - parseInt(a))
+    .map(([, val]) => val)
+
+  const [largest] = sortedVids
+
+  return { largest, poster }
+})
+
+function getAsset(object) {
+  return webasseturls.items[object.checksum]
+}
+
+function getUrl(asset) {
+  const location = webasseturls.locations[asset.url_location]
+  const { scheme, hosts: [host] } = location
+  return `${scheme}://${host}${asset.url_path}`
+}
+
+// console.log(photos)
+// console.log(videos)
+// console.log(webstream)
+// console.log(webasseturls)
+---
+
+{photos.map((photo) => {
+  const asset = getAsset(photo)
+  const src = getUrl(asset)
+  return (
+    <img width={asset.width} height={asset.height} {src} />
+  )
+})}
+
+{videos.map((video) => {
+  const asset = getAsset(video.largest)
+  const src = getUrl(asset)
+
+  const posterAsset = getAsset(video.poster)
+  const poster = getUrl(posterAsset)
+
+  return (
+    <video controls {poster} preload="none">
+      <source type="video/mp4" {src} />
+    </video>
+  )
+})}
