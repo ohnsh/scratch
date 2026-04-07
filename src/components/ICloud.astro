@@ -9,7 +9,8 @@ const photos = webstream.photos.filter(
   ({ mediaAssetType = '' }) => mediaAssetType !== 'video'
 ).map((photo) => {
   const [largest] = Object.values(photo.derivatives).sort((a, b) => Number(b.width) - Number(a.width))
-  return largest
+
+  return { largest, type: 'photo', created: photo.dateCreated, batchCreated: photo.batchDateCreated, contributor: photo.contributorFullName }
 })
 
 const videos = webstream.photos.filter(
@@ -23,7 +24,7 @@ const videos = webstream.photos.filter(
 
   const [largest] = sortedVids
 
-  return { largest, poster }
+  return { largest, poster, type: 'video', created: video.dateCreated, batchCreated: video.batchDateCreated, contributor: video.contributorFullName }
 })
 
 function getAsset(object) {
@@ -43,7 +44,7 @@ function getUrl(asset) {
 ---
 
 {photos.map((photo) => {
-  const asset = getAsset(photo)
+  const asset = getAsset(photo.largest)
   const src = getUrl(asset)
   return (
     <img width={asset.width} height={asset.height} {src} />

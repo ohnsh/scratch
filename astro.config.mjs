@@ -52,7 +52,7 @@ export default defineConfig({
         { slug: 'ptz-demo', badge: 'new' },
         'ttyd-demo',
         'yolo-demo',
-        'icloud-demo',
+        'icloud-loader',
         'github-days',
         'youtube-data-api',
         {
