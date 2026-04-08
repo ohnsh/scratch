@@ -5,9 +5,9 @@ dist/
 .astro/
 
 # fetched data cache
-.days
+.days/
 
-/public/obj-demo
+obj-demo/
 
 # dependencies
 node_modules/
