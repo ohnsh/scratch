@@ -55,7 +55,10 @@ export default defineConfig({
         { slug: 'ptz-demo', badge: 'new' },
         'ttyd-demo',
         'yolo-demo',
-        'icloud-loader',
+        {
+          label: 'iCloud Shared Album Viewer',
+          link: '/icloud-viewer',
+        },
         'github-days',
         'youtube-data-api',
         {

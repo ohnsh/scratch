@@ -1,0 +1,13 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro'
+import ICloud from '@/components/ICloud.astro'
+
+export const prerender = false
+const frontmatter = {
+  title: 'iCloud Shared Album Viewer'
+}
+---
+
+<StarlightPage {frontmatter}>
+  <ICloud token="B1dG4Tcsm1txzgH" />
+</StarlightPage>
