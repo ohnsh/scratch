@@ -1,31 +1,50 @@
 ---
+import 'photoswipe/style.css'
 import getICloudAlbum from '@/loaders/icloud'
+
+// photoswipe astro component example:
+// https://github.com/jonasfroeller/astro.image.lightbox/blob/main/src/PhotoSwipeImage.astro
 
 const token = 'B1dG4Tcsm1txzgH'
 
 const { webstream, webasseturls } = await getICloudAlbum(token)
 
-const photos = webstream.photos.filter(
-  ({ mediaAssetType = '' }) => mediaAssetType !== 'video'
-).map((photo) => {
-  const [largest] = Object.values(photo.derivatives).sort((a, b) => Number(b.width) - Number(a.width))
+const photos = webstream.photos
+  .filter(({ mediaAssetType = '' }) => mediaAssetType !== 'video')
+  .map((photo) => {
+    const [largest] = Object.values(photo.derivatives).sort(
+      (a, b) => Number(b.width) - Number(a.width)
+    )
 
-  return { largest, type: 'photo', created: photo.dateCreated, batchCreated: photo.batchDateCreated, contributor: photo.contributorFullName }
-})
+    return {
+      largest,
+      type: 'photo',
+      created: photo.dateCreated,
+      batchCreated: photo.batchDateCreated,
+      contributor: photo.contributorFullName,
+    }
+  })
 
-const videos = webstream.photos.filter(
-  ({ mediaAssetType = '' }) => mediaAssetType === 'video'
-).map((video) => {
-  const poster = video.derivatives.PosterFrame
-  const sortedVids = Object.entries(video.derivatives)
-    .filter(([key]) => !Number.isNaN(parseInt(key)))  // key !== 'PosterFrame')
-    .sort(([a], [b]) => parseInt(b) - parseInt(a))
-    .map(([, val]) => val)
+const videos = webstream.photos
+  .filter(({ mediaAssetType = '' }) => mediaAssetType === 'video')
+  .map((video) => {
+    const poster = video.derivatives.PosterFrame
+    const sortedVids = Object.entries(video.derivatives)
+      .filter(([key]) => !Number.isNaN(parseInt(key))) // key !== 'PosterFrame')
+      .sort(([a], [b]) => parseInt(b) - parseInt(a))
+      .map(([, val]) => val)
 
-  const [largest] = sortedVids
+    const [largest] = sortedVids
 
-  return { largest, poster, type: 'video', created: video.dateCreated, batchCreated: video.batchDateCreated, contributor: video.contributorFullName }
-})
+    return {
+      largest,
+      poster,
+      type: 'video',
+      created: video.dateCreated,
+      batchCreated: video.batchDateCreated,
+      contributor: video.contributorFullName,
+    }
+  })
 
 function getAsset(object) {
   return webasseturls.items[object.checksum]
@@ -33,7 +52,10 @@ function getAsset(object) {
 
 function getUrl(asset) {
   const location = webasseturls.locations[asset.url_location]
-  const { scheme, hosts: [host] } = location
+  const {
+    scheme,
+    hosts: [host],
+  } = location
   return `${scheme}://${host}${asset.url_path}`
 }
 
@@ -43,24 +65,99 @@ function getUrl(asset) {
 // console.log(webasseturls)
 ---
 
-{photos.map((photo) => {
-  const asset = getAsset(photo.largest)
-  const src = getUrl(asset)
-  return (
-    <img width={asset.width} height={asset.height} {src} />
-  )
-})}
+<div id="gallery">
+  {
+    photos.map((photo) => {
+      const asset = getAsset(photo.largest)
+      const src = getUrl(asset)
+      return (
+        <a
+          href={src}
+          data-pswp-width={photo.largest.width}
+          data-pswp-height={photo.largest.height}
+          target="_blank"
+        >
+          <img width={asset.width} height={asset.height} {src} />
+        </a>
+      )
+    })
+  }
+  {
+    videos.map((video) => {
+      const asset = getAsset(video.largest)
+      const src = getUrl(asset)
 
-{videos.map((video) => {
-  const asset = getAsset(video.largest)
-  const src = getUrl(asset)
+      const posterAsset = getAsset(video.poster)
+      const poster = getUrl(posterAsset)
 
-  const posterAsset = getAsset(video.poster)
-  const poster = getUrl(posterAsset)
+      return (
+        <a
+          href={src}
+          data-pswp-width={video.largest.width}
+          data-pswp-height={video.largest.height}
+          data-pswp-type="video"
+          target="_blank"
+        >
+          <img src={poster} alt="" />
+          {/* <video controls {poster} preload="none">
+            <source type="video/mp4" {src} />
+          </video> */}
+        </a>
+      )
+    })
+  }
+</div>
 
-  return (
-    <video controls {poster} preload="none">
-      <source type="video/mp4" {src} />
-    </video>
-  )
-})}
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox'
+  import PhotoSwipeVideoPlugin from '@/vendor/photoswipe-video-plugin.js'
+
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '#gallery',
+    children: 'a',
+    pswpModule: () => import('photoswipe'),
+  })
+
+  const videoPlugin = new PhotoSwipeVideoPlugin(lightbox, {
+    // options
+  })
+
+  lightbox.init()
+</script>
+
+<style>
+  div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding-inline: 0.5rem;
+    padding-block: 0.5rem;
+    margin-inline: auto;
+
+    /*md:grid-cols-3*/
+    --primary: var(--sl-text);
+    --secondary: var(--sl-text);
+  }
+  a {
+    overflow: hidden;
+    border: solid 1px var(--primary);
+    border-radius: 0.5rem;
+
+    &:hover {
+      border-color: var(--secondary);
+    }
+  }
+  img {
+    object-fit: cover;
+    /*
+    object-cover
+    w-full
+    grayscale-[80%]
+    hover:grayscale-0
+    transition
+    duration-300
+    ease-in-out
+    aspect-[3/2]
+  */
+  }
+</style>
