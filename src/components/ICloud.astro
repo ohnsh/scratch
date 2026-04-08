@@ -5,8 +5,11 @@ import getICloudAlbum from '@/loaders/icloud'
 // photoswipe astro component example:
 // https://github.com/jonasfroeller/astro.image.lightbox/blob/main/src/PhotoSwipeImage.astro
 
-const token = 'B1dG4Tcsm1txzgH'
+interface Props {
+  token: string
+}
 
+const { token } = Astro.props
 const { webstream, webasseturls } = await getICloudAlbum(token)
 
 const photos = webstream.photos
@@ -59,11 +62,21 @@ function getUrl(asset) {
   return `${scheme}://${host}${asset.url_path}`
 }
 
+const { streamName, userFirstName, userLastName } = webstream
+
 // console.log(photos)
 // console.log(videos)
 // console.log(webstream)
 // console.log(webasseturls)
 ---
+
+<h2>{streamName}</h2>
+
+<p>
+  {userFirstName} {userLastName}
+  •
+  <a href={`https://www.icloud.com/sharedalbum/#${token}`} target="_blank">View on iCloud</a>
+</p>
 
 <div id="gallery">
   {

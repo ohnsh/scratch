@@ -1,3 +1,5 @@
+// https://github.com/dimsemenov/photoswipe-video-plugin
+
 const defaultOptions = {
   videoAttributes: { controls: '', playsinline: '', preload: 'auto' },
   autoplay: true,
