@@ -8,6 +8,8 @@ import rehypeKatex from 'rehype-katex'
 import flexoki from 'starlight-theme-flexoki'
 import fs from 'node:fs'
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -20,6 +22,7 @@ export default defineConfig({
       },
     },
   },
+
   integrations: [
     react(),
     starlight({
@@ -73,7 +76,9 @@ export default defineConfig({
       ],
     }),
   ],
+
   markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
+  adapter: cloudflare(),
 })
 
 /** @typedef {import('@astrojs/starlight/types').StarlightUserConfig} StarlightUserConfig */
