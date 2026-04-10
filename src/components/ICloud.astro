@@ -1,6 +1,6 @@
 ---
-import 'photoswipe/style.css'
 import getICloudAlbum from '@/loaders/icloud'
+import 'glightbox/dist/css/glightbox.css'
 
 // photoswipe astro component example:
 // https://github.com/jonasfroeller/astro.image.lightbox/blob/main/src/PhotoSwipeImage.astro
@@ -86,8 +86,9 @@ const { streamName, userFirstName, userLastName } = webstream
       return (
         <a
           href={src}
-          data-pswp-width={photo.largest.width}
-          data-pswp-height={photo.largest.height}
+          class="glightbox"
+          data-width={photo.largest.width}
+          data-height={photo.largest.height}
           target="_blank"
         >
           <img width={asset.width} height={asset.height} {src} />
@@ -106,9 +107,10 @@ const { streamName, userFirstName, userLastName } = webstream
       return (
         <a
           href={src}
-          data-pswp-width={video.largest.width}
-          data-pswp-height={video.largest.height}
-          data-pswp-type="video"
+          class="glightbox"
+          data-width={video.largest.width}
+          data-height={video.largest.height}
+          data-type="video"
           target="_blank"
         >
           <img src={poster} alt="" />
@@ -122,20 +124,11 @@ const { streamName, userFirstName, userLastName } = webstream
 </div>
 
 <script>
-  import PhotoSwipeLightbox from 'photoswipe/lightbox'
-  import PhotoSwipeVideoPlugin from '@/vendor/photoswipe-video-plugin.js'
+  import GLightBox from 'glightbox'
 
-  const lightbox = new PhotoSwipeLightbox({
-    gallery: '#gallery',
-    children: 'a',
-    pswpModule: () => import('photoswipe'),
-  })
+  const lightbox = GLightBox({ })
 
-  const videoPlugin = new PhotoSwipeVideoPlugin(lightbox, {
-    // options
-  })
-
-  lightbox.init()
+  // lightbox.open()
 </script>
 
 <style>
