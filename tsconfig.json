@@ -9,7 +9,6 @@
     "dist"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
