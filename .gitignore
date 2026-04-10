@@ -8,8 +8,6 @@ dist/
 # fetched data cache
 .days/
 
-obj-demo/
-
 # dependencies
 node_modules/
 

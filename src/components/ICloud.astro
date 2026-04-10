@@ -10,8 +10,53 @@ interface Props {
   token: string
 }
 
+interface Asset {
+  url_expiry: string
+  url_location: string // keyof locations
+  url_path: string
+}
+interface Location {
+  scheme: string
+  hosts: string[]
+}
+interface WebAassetUrls {
+  locations: Record<string, Location>
+  items: Record<string, Asset> // key is checksum
+}
+interface Derivative {
+  fileSize: string
+  checksum: string
+  width: string
+  state: 'available'
+  height: string
+}
+interface WebStreamMedia {
+  batchGuid: string
+  derivatives: Record<string, Derivative>
+  contributorLastName: string
+  batchDateCreated: string
+  dateCreated: string
+  contributorFirstName: string
+  photoGuid: string
+  contributorFullName: string
+  mediaAssetType?: 'video'
+  caption: string
+}
+interface WebStream {
+  userLastName: string
+  streamCtag: string
+  itemsReturned: string
+  locations: any
+  userFirstName: string
+  streamName: string
+  photos: WebStreamMedia[]
+}
+
 const { token } = Astro.props
-const { webstream, webasseturls } = await getICloudAlbum(token)
+const { webstream, webasseturls } = (await getICloudAlbum(token)) as {
+  webstream: WebStream
+  webasseturls: WebAassetUrls
+}
 
 const photos = webstream.photos
   .filter(({ mediaAssetType = '' }) => mediaAssetType !== 'video')
@@ -50,11 +95,11 @@ const videos = webstream.photos
     }
   })
 
-function getAsset(object) {
+function getAsset(object: Derivative) {
   return webasseturls.items[object.checksum]
 }
 
-function getUrl(asset) {
+function getUrl(asset: Asset) {
   const location = webasseturls.locations[asset.url_location]
   const {
     scheme,
@@ -64,17 +109,13 @@ function getUrl(asset) {
 }
 
 const { streamName, userFirstName, userLastName } = webstream
-
-// console.log(photos)
-// console.log(videos)
-// console.log(webstream)
-// console.log(webasseturls)
 ---
 
 <h2>{streamName}</h2>
 
 <p>
-  {userFirstName} {userLastName}
+  {userFirstName}
+  {userLastName}
   •
   <a href={`https://www.icloud.com/sharedalbum/#${token}`} target="_blank">View on iCloud</a>
 </p>
@@ -84,14 +125,15 @@ const { streamName, userFirstName, userLastName } = webstream
     photos.map((photo) => {
       const asset = getAsset(photo.largest)
       const src = getUrl(asset)
+      const { width, height } = photo.largest
       return (
         <a
           href={src}
-          data-pswp-width={photo.largest.width}
-          data-pswp-height={photo.largest.height}
+          data-pswp-width={width}
+          data-pswp-height={height}
           target="_blank"
         >
-          <img width={asset.width} height={asset.height} {src} />
+          <img {src} />
         </a>
       )
     })
@@ -148,6 +190,7 @@ const { streamName, userFirstName, userLastName } = webstream
     padding-inline: 0.5rem;
     padding-block: 0.5rem;
     margin-inline: auto;
+    place-items: center;
 
     /*md:grid-cols-3*/
     --primary: var(--sl-text);
