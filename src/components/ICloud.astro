@@ -32,7 +32,7 @@ interface Derivative {
 }
 interface WebStreamMedia {
   batchGuid: string
-  derivatives: Record<string, Derivative>
+  derivatives: Record<string, Derivative> // PosterFrame key present when mediaAssetType === 'video'
   contributorLastName: string
   batchDateCreated: string
   dateCreated: string
@@ -82,7 +82,6 @@ const videos = webstream.photos
       .filter(([key]) => !Number.isNaN(parseInt(key))) // key !== 'PosterFrame')
       .sort(([a], [b]) => parseInt(b) - parseInt(a))
       .map(([, val]) => val)
-
     const [largest] = sortedVids
 
     return {
@@ -127,12 +126,7 @@ const { streamName, userFirstName, userLastName } = webstream
       const src = getUrl(asset)
       const { width, height } = photo.largest
       return (
-        <a
-          href={src}
-          data-pswp-width={width}
-          data-pswp-height={height}
-          target="_blank"
-        >
+        <a href={src} data-pswp-width={width} data-pswp-height={height} target="_blank">
           <img {src} />
         </a>
       )
@@ -208,16 +202,20 @@ const { streamName, userFirstName, userLastName } = webstream
   }
   img {
     object-fit: cover;
-    /*
-    object-cover
-    w-full
-    grayscale-[80%]
-    hover:grayscale-0
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    /* meh
+    &:not(:hover) {
+      filter: grayscale(50%);
+    }*/
+
+    /* old tailwind classes from sample code
+     *
     transition
     duration-300
     ease-in-out
-    aspect-[3/2]
-  */
+    */
   }
   /* <Icon> passes class attribute through, meaning scoped styles will work. */
   svg {
