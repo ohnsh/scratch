@@ -1,6 +1,7 @@
 ---
 import 'photoswipe/style.css'
 import getICloudAlbum from '@/loaders/icloud'
+import { Icon } from '@astrojs/starlight/components'
 
 // photoswipe astro component example:
 // https://github.com/jonasfroeller/astro.image.lightbox/blob/main/src/PhotoSwipeImage.astro
@@ -112,6 +113,7 @@ const { streamName, userFirstName, userLastName } = webstream
           target="_blank"
         >
           <img src={poster} alt="" />
+          <Icon name="seti:video" />
           {/* <video controls {poster} preload="none">
             <source type="video/mp4" {src} />
           </video> */}
@@ -155,6 +157,7 @@ const { streamName, userFirstName, userLastName } = webstream
     overflow: hidden;
     border: solid 1px var(--primary);
     border-radius: 0.5rem;
+    position: relative;
 
     &:hover {
       border-color: var(--secondary);
@@ -172,5 +175,13 @@ const { streamName, userFirstName, userLastName } = webstream
     ease-in-out
     aspect-[3/2]
   */
+  }
+  /* <Icon> passes class attribute through, meaning scoped styles will work. */
+  svg {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 2.5em;
+    height: 2.5em;
   }
 </style>
