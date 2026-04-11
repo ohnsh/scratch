@@ -1,4 +1,4 @@
-import { Detection, DetectionStats } from './types';
+import type { Detection, DetectionStats } from './types';
 
 /**
  * Processes video frames for object detection
@@ -115,7 +115,7 @@ export class VideoProcessor {
     this.allDetections = [...this.allDetections, ...detections];
     this.updateStats(detections);
     
-    console.log(`Frame detections: ${detections.length}, Total accumulated: ${this.allDetections.length}`);
+    // console.log(`Frame detections: ${detections.length}, Total accumulated: ${this.allDetections.length}`);
     
     // Send current frame detections for display (replaces previous frame's detections)
     this.detectionCallback(detections);

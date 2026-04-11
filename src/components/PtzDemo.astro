@@ -22,7 +22,8 @@ import MediaMTXViewer from './MediaMTXViewer.astro'
     return ws
   }
 
-  let keySocket: WebSocket | undefined = startKeyControl()
+  // the following check for `window` makes no sense, but it's necessary to prevent the dev server from crashing ever since I enabled the Cloudflare SSR adapter 🤔
+  let keySocket: WebSocket | undefined = typeof window !== 'undefined' ? startKeyControl(): undefined
 
   function arrowKeyHandler(e: KeyboardEvent) {
     if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {

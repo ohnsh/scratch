@@ -1,5 +1,5 @@
-import * as ort from 'onnxruntime-web/webgpu';
-import { Detection, ModelMetadata } from './types';
+import * as ort from 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.webgpu.min.mjs'
+import type { Detection, ModelMetadata } from './types';
 
 /**
  * Object detection using YOLOv12 ONNX model via ONNX Runtime Web
@@ -17,7 +17,7 @@ export class ObjectDetector {
       // Configure ONNX Runtime Web to use CDN for WASM files FIRST
       // This ensures WASM files are always available, even with base path configurations
       // Must be set before any ONNX Runtime operations
-      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.0/dist/';
+      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
       ort.env.wasm.simd = true;
       ort.env.wasm.proxy = false;
 
@@ -88,21 +88,21 @@ export class ObjectDetector {
       // Preprocess image
       const input = this.preprocessImage(imageData);
       
-      console.log(input);
+      // console.log(input);
 
       // Run inference using actual model input/output names
       const inputName = this.session.inputNames[0];
       const outputName = this.session.outputNames[0];
       
-      console.log(`Using input name: ${inputName}, output name: ${outputName}`);
+      // console.log(`Using input name: ${inputName}, output name: ${outputName}`);
       
       const results = await this.session.run({ [inputName]: input });
       const output = results[outputName] as ort.Tensor;
       
-      console.log('Model output results:', results);
-      console.log('Output tensor:', output);
-      console.log('Tensor shape:', output.dims);
-      console.log('Tensor data type:', output.type);
+      // console.log('Model output results:', results);
+      // console.log('Output tensor:', output);
+      // console.log('Tensor shape:', output.dims);
+      // console.log('Tensor data type:', output.type);
 
       // Postprocess results
       const detections = this.postprocessResults(output, imageData.width, imageData.height);
@@ -208,7 +208,7 @@ export class ObjectDetector {
     
     // YOLO output format: [batch, num_detections, 6] where 6 = x1, y1, x2, y2, confidence, class_id
     const numDetections = output.dims[1]; // 300
-    console.log(`Processing ${numDetections} detections from tensor shape:`, output.dims);
+    // console.log(`Processing ${numDetections} detections from tensor shape:`, output.dims);
     
     for (let i = 0; i < numDetections; i++) {
       const startIdx = i * 6; // Fixed 6 values per detection
@@ -225,12 +225,12 @@ export class ObjectDetector {
       if (confidence < this.metadata!.confidenceThreshold) continue;
       
       // Debug logging for first few detections
-      if (i < 5) {
-        console.log(`Detection ${i}:`, {
-          x1, y1, x2, y2, confidence, classId,
-          className: this.metadata!.classes[classId] || `class_${classId}`
-        });
-      }
+      // if (i < 5) {
+      //   console.log(`Detection ${i}:`, {
+      //     x1, y1, x2, y2, confidence, classId,
+      //     className: this.metadata!.classes[classId] || `class_${classId}`
+      //   });
+      // }
       
       // Transform from padded coordinates to original image coordinates
       const transformedX1 = (x1 - paddingX) * scaleX;
@@ -259,7 +259,7 @@ export class ObjectDetector {
       detections.push(detection);
     }
     
-    console.log(`Found ${detections.length} detections after filtering`);
+    // console.log(`Found ${detections.length} detections after filtering`);
     
     // Apply Non-Maximum Suppression
     return this.applyNMS(detections);
