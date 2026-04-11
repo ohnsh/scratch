@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import type { Detection } from '@/vendor/yolov12-onnx/types'
 
 interface DetectionOverlayProps {
-  detections: Detection[];
+  // detections: Detection[];
   videoWidth: number
   videoHeight: number
   className?: string
@@ -15,12 +15,13 @@ declare global {
 }
 
 export default function DetectionOverlay({
-  detections,
+  // detections,
   videoWidth,
   videoHeight,
   className = '',
 }: DetectionOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [detections, setDetections] = useState<Detection[]>([])
 
   // Helper function to get color based on class - vibrant color palette
   const getClassColor = useCallback((className: string): string => {
@@ -138,6 +139,15 @@ export default function DetectionOverlay({
       drawDetection(ctx, detection)
     })
   }, [detections, videoWidth, videoHeight, drawDetection])
+
+  useEffect(() => {
+    const listener = (e: CustomEvent<Detection[]>) => {
+      setDetections(e.detail)
+    }
+    document.addEventListener('yolo-detection', listener)
+    
+    return () => { document.removeEventListener('yolo-detection', listener) }
+  }, [])
 
   return (
     <canvas

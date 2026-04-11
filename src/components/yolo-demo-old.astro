@@ -1,0 +1,71 @@
+---
+import UserMedia from './UserMedia.astro'
+import DetectionOverlay from './detection-overlay-domevent'
+
+
+---
+
+<!-- <UserMedia /> -->
+<div class="not-content yolo-demo">
+  <video controls crossorigin="anonymous">
+    <source type="video/mp4" src="https://media.ohn.sh/doggos-short-2026-04-09.mp4" />
+  </video>
+  <DetectionOverlay videoWidth={1920} videoHeight={1080} client:load />
+</div>
+
+<script>
+  import { ObjectDetector } from '@/vendor/yolov12-onnx/object-detector'
+  import { VideoProcessor } from '@/vendor/yolov12-onnx/video-processor'
+  import type { Detection } from '@/vendor/yolov12-onnx/types'
+
+  const videoRef = document.querySelector<HTMLVideoElement>('.yolo-demo > video')
+  if (!videoRef) {
+    throw new Error('Failed to get yolo-demo <video> element.')
+  }
+  const detector = new ObjectDetector()
+  await detector.initialize()
+
+  function setDetections(detections: Detection[]) {
+    const event = new CustomEvent('yolo-detection', { bubbles: false, detail: detections })
+    document.dispatchEvent(event)
+  }
+
+  const processor = new VideoProcessor(
+    () => {},
+    () => {} // Stats callback not needed anymore
+  )
+
+  processor.setVideo(videoRef)
+  processor.startProcessing()
+
+  // Start detection loop
+  const detectLoop = async () => {
+    if (!detector || !processor) return
+
+    const frame = processor.getCurrentFrame()
+    if (frame) {
+      try {
+        const newDetections = await detector.detectObjects(frame)
+        setDetections(newDetections)
+      } catch (err) {
+        console.error('Detection error:', err)
+      }
+    }
+
+    // Continue loop if processing and not paused
+    if (processor && !processor.isProcessingStopped()) {
+      requestAnimationFrame(detectLoop)
+    }
+  }
+
+  detectLoop()
+</script>
+
+<style>
+  div {
+    position: relative;
+  }
+  video {
+    max-width: 100%;
+  }
+</style>
