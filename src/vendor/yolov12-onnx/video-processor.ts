@@ -29,7 +29,9 @@ export class VideoProcessor {
     
     // Create hidden canvas for frame extraction
     this.canvas = document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d')!;
+    // hat tip to edge console for the `willReadFrequently` tip.
+    // Helps the browser optimize by storing the bitmap on the CPU instead of the GPU.
+    this.ctx = this.canvas.getContext('2d', { willReadFrequently: true })!;
   }
 
   /**
