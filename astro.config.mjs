@@ -7,7 +7,6 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import flexoki from 'starlight-theme-flexoki'
 import fs from 'node:fs'
-
 import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config

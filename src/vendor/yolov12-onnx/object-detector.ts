@@ -1,4 +1,4 @@
-import * as ort from 'onnxruntime-web/webgpu';
+import * as ort from 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.webgpu.min.mjs'
 import type { Detection, ModelMetadata } from './types';
 
 /**
@@ -17,7 +17,7 @@ export class ObjectDetector {
       // Configure ONNX Runtime Web to use CDN for WASM files FIRST
       // This ensures WASM files are always available, even with base path configurations
       // Must be set before any ONNX Runtime operations
-      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.0/dist/';
+      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
       ort.env.wasm.simd = true;
       ort.env.wasm.proxy = false;
 
