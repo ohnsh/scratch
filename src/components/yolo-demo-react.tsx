@@ -19,7 +19,6 @@ export default function YoloDemo() {
       if (!videoRef.current) {
         throw new Error('videoRef not initialized in effect')
       }
-      processorRef.current.setVideo(videoRef.current)
       processorRef.current.startProcessing()
 
       detectLoop()
@@ -28,20 +27,31 @@ export default function YoloDemo() {
 
   if (!processorRef.current) {
     processorRef.current = new VideoProcessor(
-      (detections) => {
-        setDetections(detections)
-      },
+      () => {},
       () => {} // Stats callback, idk
     )
   }
 
   useEffect(() => {
-    if (stream && videoRef.current) {
+    if (!videoRef.current) {
+      throw new Error('videoRef not available in effect.')
+    }
+    if (stream) {
       videoRef.current.srcObject = stream
-      videoRef.current.onloadedmetadata = () => {}
-      videoRef.current.play()
+      videoRef.current.onloadedmetadata = (e) => {
+        videoRef.current?.play()
+      }
+      return () => {
+        if (videoRef.current) {
+          videoRef.current.onloadedmetadata = null
+        }
+      }
     }
   }, [stream])
+
+  const videoLoaded = () => {
+    processorRef.current.setVideo(videoRef.current!)
+  }
 
   // Start detection loop
   const detectLoop = async () => {
@@ -84,8 +94,10 @@ export default function YoloDemo() {
           ref={videoRef}
           controls
           playsInline
+          // autoPlay
           crossOrigin="anonymous"
           style={{ maxWidth: '100%' }}
+          onLoadedData={videoLoaded}
         >
           <source type="video/mp4" src="https://media.ohn.sh/doggos-short-2026-04-09.mp4" />
         </video>

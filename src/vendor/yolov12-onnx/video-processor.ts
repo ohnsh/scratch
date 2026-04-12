@@ -56,7 +56,7 @@ export class VideoProcessor {
     }
     
     this.isProcessing = true;
-    this.processFrame();
+    // this.processFrame();
   }
 
   stopProcessing(): void {
