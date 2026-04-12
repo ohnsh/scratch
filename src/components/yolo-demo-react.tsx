@@ -1,8 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
-import UserMedia from './UserMedia.astro'
 import DetectionOverlay from './detection-overlay'
 import { ObjectDetector } from '@/vendor/yolov12-onnx/object-detector'
-import { VideoProcessor } from '@/vendor/yolov12-onnx/video-processor'
 import type { Detection } from '@/vendor/yolov12-onnx/types'
 
 export default function YoloDemo() {
